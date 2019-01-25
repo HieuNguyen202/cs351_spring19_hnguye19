@@ -45,7 +45,7 @@ void ht_put(hashtable_t *ht, char *key, void *val) {
       *tempB = b;
       return;
     } else {                                  //If tempB != NULL
-        if ((*tempB)->key == key) {              //  If tempB->key == key
+        if (strcmp((*tempB)->key, key) == 0) {              //  If tempB->key == key
           //Update new val
           (*tempB)->val = val;
           return;

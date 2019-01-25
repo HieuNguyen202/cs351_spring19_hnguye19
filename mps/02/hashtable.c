@@ -31,11 +31,40 @@ hashtable_t *make_hashtable(unsigned long size) {
 void ht_put(hashtable_t *ht, char *key, void *val) {
   /* FIXME: the current implementation doesn't update existing entries */
   unsigned int idx = hash(key) % ht->size;
-  bucket_t *b = malloc(sizeof(bucket_t));
-  b->key = key;
-  b->val = val;
-  b->next = ht->buckets[idx];
-  ht->buckets[idx] = b;
+  bucket_t **tempB;
+  tempB = &ht->buckets[idx];
+  //bpp
+  //while(1)
+  while(1) {
+    if (*tempB == NULL) {                     //If tempB == NULL
+      //Create a new bucket b
+      bucket_t *b = malloc(sizeof(bucket_t));
+      b->key = key;
+      b->val = val;
+      //*tempB points to bucket b
+      *tempB = b;
+      return;
+    } else {                                  //If tempB != NULL
+        if ((*tempB)->key == key) {              //  If tempB->key == key
+          //Update new val
+          (*tempB)->val = val;
+          return;
+        } else{                                 //  If tempB->key != key
+          if((*tempB)->next == NULL) {            //    If tempB->next == NULL
+            //Create a new bucket b
+            bucket_t *b = malloc(sizeof(bucket_t));
+            b->key = key;
+            b->val = val;
+            //tempB->next points to bucket b
+            (*tempB)->next = b;
+            return;
+          } else {                                //    If tempB->next != NULL
+            //next node
+            *tempB = &((*tempB)->next);
+          }
+        }
+    }
+  }
 }
 
 /// Returns the value for key, or NULL if key doesn't exist.

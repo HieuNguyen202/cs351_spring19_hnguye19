@@ -31,40 +31,27 @@ hashtable_t *make_hashtable(unsigned long size) {
 void ht_put(hashtable_t *ht, char *key, void *val) {
   /* FIXME: the current implementation doesn't update existing entries */
   unsigned int idx = hash(key) % ht->size;
-  bucket_t **tempB;
-  tempB = &ht->buckets[idx];
-  //bpp
-  //while(1)
-  while(1) {
-    if (*tempB == NULL) {                     //If tempB == NULL
-      //Create a new bucket b
-      bucket_t *b = malloc(sizeof(bucket_t));
-      b->key = key;
-      b->val = val;
-      //*tempB points to bucket b
-      *tempB = b;
+
+  bucket_t *b = ht->buckets[idx];
+  bucket_t *prevB;
+  while (b) {
+    if (strcmp(b->key, key) == 0) { //if key matches
+      b->val = val;                   //update val
       return;
-    } else {                                  //If tempB != NULL
-        if (strcmp((*tempB)->key, key) == 0) {              //  If tempB->key == key
-          //Update new val
-          (*tempB)->val = val;
-          return;
-        } else{                                 //  If tempB->key != key
-          if((*tempB)->next == NULL) {            //    If tempB->next == NULL
-            //Create a new bucket b
-            bucket_t *b = malloc(sizeof(bucket_t));
-            b->key = key;
-            b->val = val;
-            //tempB->next points to bucket b
-            (*tempB)->next = b;
-            return;
-          } else {                                //    If tempB->next != NULL
-            //next node
-            *tempB = &((*tempB)->next);
-          }
-        }
     }
+    b = b->next;                    //next bucket
+    prevB = b;                      //maintain previous bucket in case key not found
   }
+  //add new bucket to the end
+  bucket_t *newB = malloc(sizeof(bucket_t));
+  newB->key = key;
+  newB->val = val;
+  if(prevB==NULL){ //If head is NULL
+    ht->buckets[idx] = newB;
+  } else{          //if head is not NULL
+    prevB->next = newB;
+  }
+  return;
 }
 
 /// Returns the value for key, or NULL if key doesn't exist.

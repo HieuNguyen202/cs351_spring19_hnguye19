@@ -148,6 +148,8 @@ void  ht_rehash(hashtable_t *ht, unsigned long newsize) {
             b = b->next;
         }
     }
+    for (int i = 0; i < oldSize; ++i) {
+        free(oldBukets[i]);
+    }
     //Free resources used by the old buckets
-    free(oldBukets);
 }

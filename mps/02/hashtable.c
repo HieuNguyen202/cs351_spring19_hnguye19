@@ -94,7 +94,9 @@ void ht_iter(hashtable_t *ht, int (*f)(char *, void *)) {
 /// Frees all keys, values, buckets, and the underlying bucket array of the hashtable.
 /// \param ht
 void free_hashtable(hashtable_t *ht) {
-  free(ht); // FIXME: must free all substructures!
+//    free(ht->size);
+//    free(ht->buckets);
+    free(ht); // FIXME: must free all substructures!
 
 }
 
@@ -105,14 +107,23 @@ void free_hashtable(hashtable_t *ht) {
 void  ht_del(hashtable_t *ht, char *key) {
     unsigned int idx = hash(key) % ht->size;
     bucket_t *b = ht->buckets[idx];
-    bucket_t *prevB;
-    while (b) {
-        if (strcmp(b->key, key) == 0) {
-            prevB->next = b->next;
-            return;
-        }
-        b = b->next;
+    if (strcmp(b->key, key) == 0) {
+        ht->buckets[idx] = b->next;
+        //TODO maybe deallocate here
+        return;
+    } else {
+        bucket_t *prevB;
         prevB = b;
+        b = b->next;
+        while (b) {
+            if (strcmp(b->key, key) == 0) {
+                prevB->next = b->next;
+                //TODO maybe deallocate here
+                return;
+            }
+            prevB = b;
+            b = b->next;
+        }
     }
 }
 

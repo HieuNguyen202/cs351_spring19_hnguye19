@@ -129,6 +129,15 @@ void  ht_del(hashtable_t *ht, char *key) {
     }
 }
 
+void recursiveFree(bucket_t *b){
+    if(b->next){
+        recursiveFree(b->next);
+    } else{
+        free(b);
+    }
+}
+
+
 /// Resizes the hashtable to contain newsize buckets, rehashing all keys and moving them into new buckets as needed.
 /// \param ht
 /// \param newsize
@@ -149,7 +158,8 @@ void  ht_rehash(hashtable_t *ht, unsigned long newsize) {
         }
     }
     for (int i = 0; i < oldSize; ++i) {
-        free(oldBukets[i]);
+        recursiveFree(oldBukets[i]);
     }
     //Free resources used by the old buckets
 }
+

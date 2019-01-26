@@ -29,29 +29,33 @@ hashtable_t *make_hashtable(unsigned long size) {
 /// \param key
 /// \param val
 void ht_put(hashtable_t *ht, char *key, void *val) {
-  /* FIXME: the current implementation doesn't update existing entries */
-  unsigned int idx = hash(key) % ht->size;
-
-  bucket_t *b = ht->buckets[idx];
-  bucket_t *prevB;
-  while (b) {
-    if (strcmp(b->key, key) == 0) { //if key matches
-      b->val = val;                   //update val
-      return;
+    /* FIXME: the current implementation doesn't update existing entries */
+    unsigned int idx = hash(key) % ht->size;
+    bucket_t *b = ht->buckets[idx]; //HEAD
+    if (b==NULL) {//If HEAD is NULL
+        bucket_t *newB = malloc(sizeof(bucket_t));
+        newB->key = key;
+        newB->val = val;
+        newB->next = NULL; //to make it null
+        ht->buckets[idx] = newB;
+        return;
+    } else {//If HEAD is not NULL
+        while (b) {
+            if (strcmp(b->key, key) == 0) { //if key matches
+                b->val = val;                   //update val
+                return;
+            } else if (b->next == NULL) {//If key doesn't match and b->next is NULL
+                bucket_t *newB = malloc(sizeof(bucket_t));
+                newB->key = key;
+                newB->val = val;
+                newB->next = NULL;
+                b->next = newB;
+                return;
+            } else {//If key doesn't match and b->next is not NULL
+                b = b->next;                    //next bucket
+            }
+        }
     }
-    b = b->next;                    //next bucket
-    prevB = b;                      //maintain previous bucket in case key not found
-  }
-  //add new bucket to the end
-  bucket_t *newB = malloc(sizeof(bucket_t));
-  newB->key = key;
-  newB->val = val;
-  if(prevB==NULL){ //If head is NULL
-    ht->buckets[idx] = newB;
-  } else{          //if head is not NULL
-    prevB->next = newB;
-  }
-  return;
 }
 
 /// Returns the value for key, or NULL if key doesn't exist.
@@ -91,6 +95,7 @@ void ht_iter(hashtable_t *ht, int (*f)(char *, void *)) {
 /// \param ht
 void free_hashtable(hashtable_t *ht) {
   free(ht); // FIXME: must free all substructures!
+
 }
 
 /* TODO */
@@ -98,6 +103,17 @@ void free_hashtable(hashtable_t *ht) {
 /// \param ht
 /// \param key
 void  ht_del(hashtable_t *ht, char *key) {
+    unsigned int idx = hash(key) % ht->size;
+    bucket_t *b = ht->buckets[idx];
+    bucket_t *prevB;
+    while (b) {
+        if (strcmp(b->key, key) == 0) {
+            prevB->next = b->next;
+            return;
+        }
+        b = b->next;
+        prevB = b;
+    }
 }
 
 /// Resizes the hashtable to contain newsize buckets, rehashing all keys and moving them into new buckets as needed.

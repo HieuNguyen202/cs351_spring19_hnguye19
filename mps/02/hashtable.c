@@ -120,4 +120,21 @@ void  ht_del(hashtable_t *ht, char *key) {
 /// \param ht
 /// \param newsize
 void  ht_rehash(hashtable_t *ht, unsigned long newsize) {
+    //Save old size and pointers to a temporary variables
+    int oldSize = ht->size;
+    bucket_t **oldBukets;
+    oldBukets = ht->buckets;
+    //The new size to the hashtable table and allocate space for the new bucket size
+    ht->size = newsize;
+    ht->buckets = calloc(sizeof(bucket_t *), newsize);
+    //Transfer buckets from the old mem to new mem
+    for (int i = 0; i < oldSize; ++i) {
+        bucket_t *b = oldBukets[i];
+        while(b!=NULL){
+            ht_put(ht, b->key, b->val);
+            b = b->next;
+        }
+    }
+    //Free resources used by the old buckets
+    free(oldBukets);
 }

@@ -95,7 +95,7 @@ void ht_iter(hashtable_t *ht, int (*f)(char *, void *)) {
 /// \param ht
 void free_hashtable(hashtable_t *ht) {
 //    free(ht->size);
-//    free(ht->buckets);
+    free(ht->buckets);
     free(ht); // FIXME: must free all substructures!
 
 }
@@ -109,6 +109,7 @@ void  ht_del(hashtable_t *ht, char *key) {
     bucket_t *b = ht->buckets[idx];
     if (strcmp(b->key, key) == 0) {
         ht->buckets[idx] = b->next;
+        free(b);
         //TODO maybe deallocate here
         return;
     } else {
@@ -118,6 +119,7 @@ void  ht_del(hashtable_t *ht, char *key) {
         while (b) {
             if (strcmp(b->key, key) == 0) {
                 prevB->next = b->next;
+                free(b);
                 //TODO maybe deallocate here
                 return;
             }

@@ -132,9 +132,9 @@ void  ht_del(hashtable_t *ht, char *key) {
 void recursiveFree(bucket_t *b){
     if(b->next){
         recursiveFree(b->next);
-    } else{
-        free(b);
+
     }
+    free(b);
 }
 
 

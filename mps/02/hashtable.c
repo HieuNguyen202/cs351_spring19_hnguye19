@@ -97,7 +97,6 @@ void free_hashtable(hashtable_t *ht) {
 //    free(ht->size);
     free(ht->buckets);
     free(ht); // FIXME: must free all substructures!
-
 }
 
 /* TODO */
@@ -131,18 +130,18 @@ void  ht_del(hashtable_t *ht, char *key) {
 
 /// next have to be NULL before calling this funciton
 /// \param b
-void freeBucket(bucket_t *b){
-    free(&(b->key));
-    free(&(b->val));
-    free(&(b->next));
-}
+//void freeBucket(bucket_t *b){
+//    free(b->key);
+//    free(b->val);
+//    free(b->next);
+//}
 
-void recursiveFree(bucket_t *b){
-    if(b->next){
-        recursiveFree(b->next);
-    }
-    freeBucket(b);
-}
+//void recursiveFree(bucket_t *b){
+//    if(b->next){
+//        recursiveFree(b->next);
+//    }
+//    freeBucket(b);
+//}
 
 
 /// Resizes the hashtable to contain newsize buckets, rehashing all keys and moving them into new buckets as needed.
@@ -164,9 +163,9 @@ void  ht_rehash(hashtable_t *ht, unsigned long newsize) {
             b = b->next;
         }
     }
-    for (int i = 0; i < oldSize; ++i) {
-        recursiveFree(oldBukets[i]);
-    }
+//    for (int i = 0; i < oldSize; ++i) {
+//        recursiveFree(oldBukets[i]);
+//    }
     //Free resources used by the old buckets
 }
 

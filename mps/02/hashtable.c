@@ -132,9 +132,9 @@ void  ht_del(hashtable_t *ht, char *key) {
 /// next have to be NULL before calling this funciton
 /// \param b
 void freeBucket(bucket_t *b){
-    free(b->key);
-    free(b->val);
-    free(b->next);
+    free(&(b->key));
+    free(&(b->val));
+    free(&(b->next));
 }
 
 void recursiveFree(bucket_t *b){

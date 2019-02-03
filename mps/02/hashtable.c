@@ -42,7 +42,9 @@ void ht_put(hashtable_t *ht, char *key, void *val) {
     } else {//If HEAD is not NULL
         while (b) {
             if (strcmp(b->key, key) == 0) { //if key matches
-                b->val = val;                   //update val
+                free(b->val);           //free old val
+                b->val = val;           //set new val
+                free(key);              //free new key
                 return;
             } else if (b->next == NULL) {//If key doesn't match and b->next is NULL
                 bucket_t *newB = malloc(sizeof(bucket_t));
@@ -69,7 +71,9 @@ bucket_t *get_last_bucket(bucket_t *b){
     return b;
 }
 
-
+/// Put the entire bucket in the hashtable
+/// \param ht
+/// \param nb
 void _ht_put(hashtable_t *ht, bucket_t *nb) {
     //If NULL, return right away
     if(nb==NULL)
@@ -137,11 +141,9 @@ void freeBucket(bucket_t *b){
     free(b);
 }
 
-
 /// Frees all keys, values, buckets, and the underlying bucket array of the hashtable.
 /// \param ht
 void free_hashtable(hashtable_t *ht) {
-//    free(ht->size);
     for (int i = 0; i < ht->size; ++i) {
         freeBucket(ht->buckets[i]);
     }
@@ -149,7 +151,6 @@ void free_hashtable(hashtable_t *ht) {
     free(ht); // FIXME: must free all substructures!
 }
 
-/* TODO */
 /// Removes the mapping for key
 /// \param ht
 /// \param key
@@ -160,7 +161,6 @@ void  ht_del(hashtable_t *ht, char *key) {
         ht->buckets[idx] = b->next;
         b->next = NULL;
         freeBucket(b);
-        //TODO maybe deallocate here
         return;
     } else {
         bucket_t *prevB;
@@ -171,7 +171,6 @@ void  ht_del(hashtable_t *ht, char *key) {
                 prevB->next = b->next;
                 b->next = NULL;
                 freeBucket(b);
-                //TODO maybe deallocate here
                 return;
             }
             prevB = b;

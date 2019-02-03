@@ -171,14 +171,6 @@ void freeBucket(bucket_t *b){
     free(b->next);
 }
 
-void recursiveFree(bucket_t *b){
-    if(b->next){
-        recursiveFree(b->next);
-    }
-    freeBucket(b);
-}
-
-
 /// Resizes the hashtable to contain newsize buckets, rehashing all keys and moving them into new buckets as needed.
 /// \param ht
 /// \param newsize

@@ -158,7 +158,8 @@ void  ht_del(hashtable_t *ht, char *key) {
     bucket_t *b = ht->buckets[idx];
     if (strcmp(b->key, key) == 0) {
         ht->buckets[idx] = b->next;
-        free(b);
+        b->next = NULL;
+        freeBucket(b);
         //TODO maybe deallocate here
         return;
     } else {
@@ -168,7 +169,8 @@ void  ht_del(hashtable_t *ht, char *key) {
         while (b) {
             if (strcmp(b->key, key) == 0) {
                 prevB->next = b->next;
-                free(b);
+                b->next = NULL;
+                freeBucket(b);
                 //TODO maybe deallocate here
                 return;
             }

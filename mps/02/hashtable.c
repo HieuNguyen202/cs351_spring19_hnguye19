@@ -25,36 +25,38 @@ hashtable_t *make_hashtable(unsigned long size) {
 }
 
 /// Inserts the key => val mapping, or updates the value for key, if it is already in the hashtable.
-/// \param ht
-/// \param key
-/// \param val
+/// \param ht   pointer to the hashtable of interest
+/// \param key  poiter to the new key
+/// \param val  pointer to the new value
 void ht_put(hashtable_t *ht, char *key, void *val) {
-    /* FIXME: the current implementation doesn't update existing entries */
+    /* FIXME (fixed): the current implementation doesn't update existing entries */
     unsigned int idx = hash(key) % ht->size;
     bucket_t *b = ht->buckets[idx]; //HEAD
-    if (b==NULL) {//If HEAD is NULL
+    if (b==NULL) {                          //If the head link is NULL, put the new bucket into head link
         bucket_t *newB = malloc(sizeof(bucket_t));
         newB->key = key;
         newB->val = val;
-        newB->next = NULL; //to make it null
-        ht->buckets[idx] = newB;
+        newB->next = NULL;                  //Initialize next bucket to NULL
+        ht->buckets[idx] = newB;            //put the new bucket into head link
+        //Since the new key and value are used, no need to free them in the heap
         return;
-    } else {//If HEAD is not NULL
+    } else {                                //If HEAD is not NULL
         while (b) {
-            if (strcmp(b->key, key) == 0) { //if key matches
-                free(b->val);           //free old val
-                b->val = val;           //set new val
-                free(key);              //free new key
+            if (strcmp(b->key, key) == 0) { //if key matches, replace the old val (also free some data)
+                free(b->val);               //free old val
+                b->val = val;               //set new val
+                free(key);                  //free new key, since it's identical to the old key
                 return;
-            } else if (b->next == NULL) {//If key doesn't match and b->next is NULL
+            } else if (b->next == NULL) {   //If key doesn't match and b->next is NULL
                 bucket_t *newB = malloc(sizeof(bucket_t));
                 newB->key = key;
                 newB->val = val;
-                newB->next = NULL;
+                newB->next = NULL;          //Initialize next bucket to NULL
                 b->next = newB;
+                //Since the new key and value are used, no need to free them in the heap
                 return;
-            } else {//If key doesn't match and b->next is not NULL
-                b = b->next;                    //next bucket
+            } else {                        //If key doesn't match and b->next is not NULL
+                b = b->next;                //process the nextbucket
             }
         }
     }

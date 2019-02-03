@@ -128,10 +128,12 @@ void ht_iter(hashtable_t *ht, int (*f)(char *, void *)) {
 /// Frees all keys, values, buckets, and the underlying bucket array of the hashtable.
 /// \param ht
 void free_hashtable(hashtable_t *ht) {
-//    free(ht->size);
+    free(ht->size);
+    for (int i = 0; i < ht->size; ++i) {
+        freeBucket(ht->buckets[i]);
+    }
     free(ht->buckets);
     free(ht); // FIXME: must free all substructures!
-
 }
 
 /* TODO */

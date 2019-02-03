@@ -72,27 +72,24 @@ bucket_t *get_last_bucket(bucket_t *b){
 }
 
 /// Put the entire bucket in the hashtable
-/// \param ht
-/// \param nb
+/// \param ht pointer to the hashtable of interest
+/// \param nb pointer the new bucket to be put into ht
 void _ht_put(hashtable_t *ht, bucket_t *nb) {
-    //If NULL, return right away
-    if(nb==NULL)
+    if(nb==NULL)                        //If NULL, return right away
         return;
     bucket_t *temp_b;
     unsigned int idx;
-
+    //Since every link the the old chain may hash to a different value in the re-sized hashtable we have to rehash every all of them individually, can't put the entire chain at once/
     do{
         idx = hash(nb->key) % ht->size;
-        if (ht->buckets[idx] == NULL) {//If HEAD is NULL
+        if (ht->buckets[idx] == NULL) { //If HEAD is NULL
             ht->buckets[idx] = nb;
-        } else {//If HEAD is not NULL
+        } else {                        //If HEAD is not NULL
             get_last_bucket(ht->buckets[idx])->next = nb;
         }
-        //set the the next b to NULL
-        temp_b = nb->next;
-        nb->next = NULL;
-        //Prep to put the next link
-        nb = temp_b;
+        temp_b = nb->next;              //save temp next bucket in a temp pointer
+        nb->next = NULL;                //Cut off all element after b in the new bucket link
+        nb = temp_b;                    //Prep to put the next link to ht
     } while(nb!=NULL);
 }
 

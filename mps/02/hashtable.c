@@ -60,13 +60,13 @@ void ht_put(hashtable_t *ht, char *key, void *val) {
     }
 }
 
-/// Get the tail of the bucket link
-/// \param b
+/// Return the last pointer to the last bucket in the bucket chain starting with b
+/// \param b pointer to the start bucket of a chain's whose last bucket is returned
 /// \return
 bucket_t *get_last_bucket(bucket_t *b){
-    if(b==NULL)
+    if(b==NULL)             //If NULL, return NULL.
         return NULL;
-    while(b->next!=NULL)
+    while(b->next!=NULL)    //Iterate until the next bucket of a current bucket is NULL, then the current bucket is the last element in the chain
         b = b->next;
     return b;
 }

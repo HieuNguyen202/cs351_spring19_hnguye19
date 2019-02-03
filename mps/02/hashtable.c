@@ -96,9 +96,9 @@ void _ht_put(hashtable_t *ht, bucket_t *nb) {
 }
 
 /// Returns the value for key, or NULL if key doesn't exist.
-/// \param ht
-/// \param key
-/// \return
+/// \param ht pointer to the hashtable of interest
+/// \param key pointer to the key of be looked up
+/// \return pointer to the val corresponding the key given
 void *ht_get(hashtable_t *ht, char *key) {
   unsigned int idx = hash(key) % ht->size;
   bucket_t *b = ht->buckets[idx];

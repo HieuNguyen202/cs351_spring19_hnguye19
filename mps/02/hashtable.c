@@ -179,24 +179,22 @@ void  ht_del(hashtable_t *ht, char *key) {
 }
 
 /// Resizes the hashtable to contain newsize buckets, rehashing all keys and moving them into new buckets as needed.
-/// \param ht
-/// \param newsize
+/// \param ht pointer to the hashtable of interest
+/// \param newsize the new number of buckets
 void  ht_rehash(hashtable_t *ht, unsigned long newsize) {
     //Alloc memory for new buckets
     bucket_t **oldBukets = ht->buckets;
     int oldSize = ht->size;
 
-    //Change size of ht
-    ht->size=newsize;
-    //Alloc new buckets for the ht
-    bucket_t **newBuckets = calloc(sizeof(bucket_t *), newsize);
-    ht->buckets = newBuckets;
+    ht->size=newsize;               //Change size of ht
+    bucket_t **newBuckets = calloc(sizeof(bucket_t *), newsize);    //Alloc new buckets for the ht
+    ht->buckets = newBuckets;       //Set new buckets to the ht
 
     //Transfer buckets from the old mem to new mem
     for (int i = 0; i < oldSize; ++i) {
         _ht_put(ht, oldBukets[i]);
     }
-    //Free resources used by the old buckets
+    //Free memory of the oldBuckets
     free(oldBukets);
 }
 

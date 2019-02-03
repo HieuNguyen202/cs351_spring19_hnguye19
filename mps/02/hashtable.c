@@ -165,7 +165,9 @@ void  ht_del(hashtable_t *ht, char *key) {
 
 /// next have to be NULL before calling this funciton
 /// \param b
-void *freeBucket(bucket_t *b){
+void freeBucket(bucket_t *b){
+    if(b==NULL)
+        return;
     free(b->key);
     free(b->val);
     freeBucket(b->next);

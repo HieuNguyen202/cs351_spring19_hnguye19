@@ -125,10 +125,23 @@ void ht_iter(hashtable_t *ht, int (*f)(char *, void *)) {
   }
 }
 
+
+/// next have to be NULL before calling this funciton
+/// \param b
+void freeBucket(bucket_t *b){
+    if(b==NULL)
+        return;
+    free(b->key);
+    free(b->val);
+    freeBucket(b->next);
+    free(b);
+}
+
+
 /// Frees all keys, values, buckets, and the underlying bucket array of the hashtable.
 /// \param ht
 void free_hashtable(hashtable_t *ht) {
-    free(ht->size);
+//    free(ht->size);
     for (int i = 0; i < ht->size; ++i) {
         freeBucket(ht->buckets[i]);
     }
@@ -163,17 +176,6 @@ void  ht_del(hashtable_t *ht, char *key) {
             b = b->next;
         }
     }
-}
-
-/// next have to be NULL before calling this funciton
-/// \param b
-void freeBucket(bucket_t *b){
-    if(b==NULL)
-        return;
-    free(b->key);
-    free(b->val);
-    freeBucket(b->next);
-    free(b);
 }
 
 /// Resizes the hashtable to contain newsize buckets, rehashing all keys and moving them into new buckets as needed.

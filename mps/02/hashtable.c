@@ -73,7 +73,7 @@ bucket_t *get_last_bucket(bucket_t *b){
     return b;
 }
 
-/// Put the entire bucket in the hashtable
+/// Put the existing bucket in the hashtable (instead of allocating a new bucket from a key, value pair)
 /// \param ht pointer to the hashtable of interest
 /// \param nb pointer the new bucket to be put into ht
 void _ht_put(hashtable_t *ht, bucket_t *nb) {

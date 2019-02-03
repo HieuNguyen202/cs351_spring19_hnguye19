@@ -129,15 +129,15 @@ void ht_iter(hashtable_t *ht, int (*f)(char *, void *)) {
 }
 
 
-/// next have to be NULL before calling this funciton
-/// \param b
+/// Recursively free all buckets in a chain of bucket starting from b.
+/// \param b starting bucket of the chain of buckets to be freed.
 void freeBucket(bucket_t *b){
-    if(b==NULL)
+    if(b==NULL)             //has reached the last bucket, return
         return;
     free(b->key);
     free(b->val);
-    freeBucket(b->next);
-    free(b);
+    freeBucket(b->next);    //free all buckets behind before freeing itself
+    free(b);                //free the bucket itself
 }
 
 /// Frees all keys, values, buckets, and the underlying bucket array of the hashtable.

@@ -112,7 +112,7 @@ void *ht_get(hashtable_t *ht, char *key) {
 }
 
 /// Calls f with all key/value mappings in the hashtable; iteration can be terminated early if f returns 0.
-/// \param ht ht pointer to the hashtable of interest
+/// \param ht pointer to the hashtable of interest
 /// \param f pinter the function
 void ht_iter(hashtable_t *ht, int (*f)(char *, void *)) {
   bucket_t *b;
@@ -141,7 +141,7 @@ void freeBucket(bucket_t *b){
 }
 
 /// Frees all keys, values, buckets, and the underlying bucket array of the hashtable.
-/// \param ht
+/// \param ht pointer to the hashtable of interest
 void free_hashtable(hashtable_t *ht) {
     for (int i = 0; i < ht->size; ++i) {
         freeBucket(ht->buckets[i]);
@@ -151,29 +151,29 @@ void free_hashtable(hashtable_t *ht) {
 }
 
 /// Removes the mapping for key
-/// \param ht
-/// \param key
+/// \param ht pointer to the hashtable of interest
+/// \param key pointer to the key of the bucket to be removed.
 void  ht_del(hashtable_t *ht, char *key) {
     unsigned int idx = hash(key) % ht->size;
     bucket_t *b = ht->buckets[idx];
-    if (strcmp(b->key, key) == 0) {
-        ht->buckets[idx] = b->next;
-        b->next = NULL;
-        freeBucket(b);
+
+    if (strcmp(b->key, key) == 0) {         //If the matching bucket is a head link in the chain
+        ht->buckets[idx] = b->next;         //The head link points to the next of that bucket
+        b->next = NULL;                     //NULL the next bucket so freeBucket will not accidentally free all buckets behind it
+        freeBucket(b);                      //free memory of the removed bucket
         return;
-    } else {
-        bucket_t *prevB;
-        prevB = b;
+    } else {                                //If the matching bucket is NOT a head link in the chain
+        bucket_t *prevB = b;
         b = b->next;
-        while (b) {
-            if (strcmp(b->key, key) == 0) {
-                prevB->next = b->next;
-                b->next = NULL;
-                freeBucket(b);
+        while (b) {                         //Traverse to the bucket whose next is the bucket to be deleted
+            if (strcmp(b->key, key) == 0) { //Find that he next bucket matches with the given key
+                prevB->next = b->next;      //remove the link from the chain
+                b->next = NULL;             //NULL the next bucket so freeBucket will not accidentally free all buckets behind it
+                freeBucket(b);              //free memory of the removed bucket
                 return;
             }
             prevB = b;
-            b = b->next;
+            b = b->next;                    //Keep looking for the matching bucket
         }
     }
 }

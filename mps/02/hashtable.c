@@ -112,8 +112,8 @@ void *ht_get(hashtable_t *ht, char *key) {
 }
 
 /// Calls f with all key/value mappings in the hashtable; iteration can be terminated early if f returns 0.
-/// \param ht
-/// \param f
+/// \param ht ht pointer to the hashtable of interest
+/// \param f pinter the function
 void ht_iter(hashtable_t *ht, int (*f)(char *, void *)) {
   bucket_t *b;
   unsigned long i;

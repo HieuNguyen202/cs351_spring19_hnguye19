@@ -15,8 +15,8 @@ unsigned long hash(char *str) {
 }
 
 /// Creates a hashtable with size buckets.
-/// \param size
-/// \return
+/// \param size number of buckets in the hashtable
+/// \return pointer to the newly created hashtable
 hashtable_t *make_hashtable(unsigned long size) {
   hashtable_t *ht = malloc(sizeof(hashtable_t));
   ht->size = size;

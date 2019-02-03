@@ -58,6 +58,40 @@ void ht_put(hashtable_t *ht, char *key, void *val) {
     }
 }
 
+/// Get the tail of the bucket link
+/// \param b
+/// \return
+bucket_t *get_last_bucket(bucket_t *b){
+    if(b==NULL)
+        return NULL;
+    while(b->next!=NULL)
+        b = b->next;
+    return b;
+}
+
+
+void _ht_put(hashtable_t *ht, bucket_t *nb) {
+    //If NULL, return right away
+    if(nb==NULL)
+        return;
+    bucket_t *temp_b;
+    unsigned int idx;
+
+    do{
+        idx = hash(nb->key) % ht->size;
+        if (ht->buckets[idx] == NULL) {//If HEAD is NULL
+            ht->buckets[idx] = nb;
+        } else {//If HEAD is not NULL
+            get_last_bucket(ht->buckets[idx])->next = nb;
+        }
+        //set the the next b to NULL
+        temp_b = nb->next;
+        nb->next = NULL;
+        //Prep to put the next link
+        nb = temp_b;
+    } while(nb!=NULL);
+}
+
 /// Returns the value for key, or NULL if key doesn't exist.
 /// \param ht
 /// \param key
@@ -97,6 +131,7 @@ void free_hashtable(hashtable_t *ht) {
 //    free(ht->size);
     free(ht->buckets);
     free(ht); // FIXME: must free all substructures!
+
 }
 
 /* TODO */
@@ -130,42 +165,39 @@ void  ht_del(hashtable_t *ht, char *key) {
 
 /// next have to be NULL before calling this funciton
 /// \param b
-//void freeBucket(bucket_t *b){
-//    free(b->key);
-//    free(b->val);
-//    free(b->next);
-//}
+void freeBucket(bucket_t *b){
+    free(b->key);
+    free(b->val);
+    free(b->next);
+}
 
-//void recursiveFree(bucket_t *b){
-//    if(b->next){
-//        recursiveFree(b->next);
-//    }
-//    freeBucket(b);
-//}
+void recursiveFree(bucket_t *b){
+    if(b->next){
+        recursiveFree(b->next);
+    }
+    freeBucket(b);
+}
 
 
 /// Resizes the hashtable to contain newsize buckets, rehashing all keys and moving them into new buckets as needed.
 /// \param ht
 /// \param newsize
 void  ht_rehash(hashtable_t *ht, unsigned long newsize) {
-    //Save old size and pointers to a temporary variables
+    //Alloc memory for new buckets
+    bucket_t **oldBukets = ht->buckets;
     int oldSize = ht->size;
-    bucket_t **oldBukets;
-    oldBukets = ht->buckets;
-    //The new size to the hashtable table and allocate space for the new bucket size
-    ht->size = newsize;
-    ht->buckets = calloc(sizeof(bucket_t *), newsize);
+
+    //Change size of ht
+    ht->size=newsize;
+    //Alloc new buckets for the ht
+    bucket_t **newBuckets = calloc(sizeof(bucket_t *), newsize);
+    ht->buckets = newBuckets;
+
     //Transfer buckets from the old mem to new mem
     for (int i = 0; i < oldSize; ++i) {
-        bucket_t *b = oldBukets[i];
-        while(b!=NULL){
-            ht_put(ht, b->key, b->val);
-            b = b->next;
-        }
+        _ht_put(ht, oldBukets[i]);
     }
-//    for (int i = 0; i < oldSize; ++i) {
-//        recursiveFree(oldBukets[i]);
-//    }
     //Free resources used by the old buckets
+    free(oldBukets);
 }
 

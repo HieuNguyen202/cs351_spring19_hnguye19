@@ -165,16 +165,35 @@ void eval(char *cmdline)
 {
   /* the following code demonstrates how to use parseline --- you'll 
    * want to replace most of it (at least the print statements). */
-  int i, bg;
-  char *argv[MAXARGS];
+    int i, bg;
+    pid_t pid = NULL;
+    char *argv[MAXARGS];
+    bg = parseline(cmdline, argv);
+    if(!builtin_cmd(argv)){
+        //print out argument list
 
-  bg = parseline(cmdline, argv);
-  if (bg) {
-    printf("background job requested\n");
-  }
-  for (i=0; argv[i] != NULL; i++) {
-    printf("argv[%d]=%s%s", i, argv[i], (argv[i+1]==NULL)?"\n":", ");
-  }
+
+        pid=fork();
+        if (pid < 0){ //error creating child process
+            printf("Error creating the child process\n");
+        } else if (pid==0){ //Child process
+          printf("I'm the child %d\n", getpid());
+          if(execvp(*argv, argv)<0){ //Program execution error
+              printf("Program not found below is the detail\n");
+              for (i=0; argv[i] != NULL; i++) {
+                printf("argv[%d]=%s%s", i, argv[i], (argv[i+1]==NULL)?"\n":", ");
+              }
+            } else{ //Program is runing
+              printf("Child: program is runing...\n");
+            }
+        } else {//parent process
+            printf("I'm the parent %d\n", getpid());
+            if (bg) {
+              //wait
+              printf("background job requested\n");
+            }
+        }
+    }
   return;
 }
 

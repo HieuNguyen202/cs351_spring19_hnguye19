@@ -172,7 +172,6 @@ void eval(char *cmdline)
     if(!builtin_cmd(argv)){
         //print out argument list
 
-
         pid=fork();
         if (pid < 0){ //error creating child process
             printf("Error creating the child process\n");
@@ -292,7 +291,8 @@ void waitfg(pid_t pid)
  */
 void sigchld_handler(int sig) 
 {
-  return;
+    printf("SIGCHLD received\n");
+    return;
 }
 
 /* 
@@ -302,6 +302,7 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig) 
 {
+    printf("SIGINT received\n");
   return;
 }
 
@@ -312,7 +313,8 @@ void sigint_handler(int sig)
  */
 void sigtstp_handler(int sig) 
 {
-  return;
+    printf("SIGSTP received\n");
+    return;
 }
 
 /*********************

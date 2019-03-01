@@ -260,14 +260,14 @@ int parseline(const char *cmdline, char **argv)
 int builtin_cmd(char **argv) 
 {
     if(strcmp(argv[0],"quit")){            //quit: terminates the shell.
-
+      printf("quit");
     } else if(strcmp(argv[0],"jobs")){     //jobs: lists all background jobs.
-
+      printf("jobs");
     } else if(strcmp(argv[0],"bg")){       //bg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the background. The <job> argument can be either a PID or a JID.
-
+      printf("bg");
     } else if(strcmp(argv[0],"fg")){       //fg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the foreground. The <job> argument can be either a PID or a JID.
-
-    } else if(strcmp(argv[0],"quit")){
+      printf("fg");
+    } else {
         return 0;     /* not a builtin command */
     }
 }

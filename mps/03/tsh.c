@@ -268,13 +268,13 @@ int builtin_cmd(char **argv) {
     printf("bg\n");
     return 1;
   } else if (!strcmp(argv[0], "fg")) {       //fg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the foreground. The <job> argument can be either a PID or a JID.
-    return builtin_cmd_fg(argv);
+    return builtin_cmd_fgbg(argv, FG);
   } else {
     return 0;                           /* not a builtin command */
   }
 }
 
-int builtin_cmd_fg(char **argv) {
+int builtin_cmd_fgbg(char **argv, int state) {
   struct job_t *job;
   //Get the job from given the ID
   if (argv[1][0] == '%') {                  //JID is given
@@ -283,9 +283,18 @@ int builtin_cmd_fg(char **argv) {
     job = getjobpid(jobs, atoi(&argv[1][0]));
   }
   if (job != NULL) {                        //if a valid PID or JID is given
-    kill(job->pid, SIGCONT);                //send SIGCONT signal to the job
-    job->state = FG;
-    waitfg(job->pid);
+      if(state==FG){
+          //Bring current fg job to background
+          struct job_t *curr_fg_job;
+          if((curr_fg_job = getjobpid(jobs, fgpid(jobs))) != NULL){
+              curr_fg_job->state = BG;
+          }
+      }
+      job->state = state;
+      kill(job->pid, SIGCONT);                //send SIGCONT signal to the job
+      if(state == FG){
+          waitfg(job->pid);
+      }
   }
   return 1;
 }

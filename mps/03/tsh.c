@@ -261,9 +261,9 @@ int builtin_cmd(char **argv)
 {
     if(!strcmp(argv[0],"quit")){            //quit: terminates the shell.
       printf("quit\n");
-      return 1;
+      return 1;                             //is a builtin command
     } else if(!strcmp(argv[0],"jobs")){     //jobs: lists all background jobs.
-      printf("jobs\n");
+      listjobs(jobs);
       return 1;
     } else if(!strcmp(argv[0],"bg")){       //bg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the background. The <job> argument can be either a PID or a JID.
       printf("bg\n");
@@ -272,7 +272,7 @@ int builtin_cmd(char **argv)
       printf("fg\n");
       return 1;
     } else {
-        return 0;     /* not a builtin command */
+        return 0;                           /* not a builtin command */
     }
 }
 

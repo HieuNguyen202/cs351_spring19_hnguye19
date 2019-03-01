@@ -265,8 +265,7 @@ int builtin_cmd(char **argv) {
     listjobs(jobs);
     return 1;
   } else if (!strcmp(argv[0], "bg")) {       //bg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the background. The <job> argument can be either a PID or a JID.
-    printf("bg\n");
-    return 1;
+    return builtin_cmd_fgbg(argv, BG);
   } else if (!strcmp(argv[0], "fg")) {       //fg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the foreground. The <job> argument can be either a PID or a JID.
     return builtin_cmd_fgbg(argv, FG);
   } else {

@@ -292,6 +292,7 @@ void waitfg(pid_t pid)
 void sigchld_handler(int sig) 
 {
     printf("SIGCHLD received\n");
+    wait(NULL);
     return;
 }
 

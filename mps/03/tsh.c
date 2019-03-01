@@ -259,7 +259,17 @@ int parseline(const char *cmdline, char **argv)
  */
 int builtin_cmd(char **argv) 
 {
-  return 0;     /* not a builtin command */
+    if(strcmp(argv[0],"quit")){            //quit: terminates the shell.
+
+    } else if(strcmp(argv[0],"jobs")){     //jobs: lists all background jobs.
+
+    } else if(strcmp(argv[0],"bg")){       //bg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the background. The <job> argument can be either a PID or a JID.
+
+    } else if(strcmp(argv[0],"fg")){       //fg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the foreground. The <job> argument can be either a PID or a JID.
+
+    } else if(strcmp(argv[0],"quit")){
+        return 0;     /* not a builtin command */
+    }
 }
 
 /* 

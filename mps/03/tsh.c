@@ -161,38 +161,38 @@ int main(int argc, char **argv)
  * background children don't receive SIGINT (SIGTSTP) from the kernel
  * when we type ctrl-c (ctrl-z) at the keyboard.  
  */
-void eval(char *cmdline) 
-{
+void eval(char *cmdline) {
   /* the following code demonstrates how to use parseline --- you'll 
    * want to replace most of it (at least the print statements). */
-    int i, bg;
-    pid_t pid = NULL;
-    char *argv[MAXARGS];
-    bg = parseline(cmdline, argv);
-    if(!builtin_cmd(argv)){
-        //print out argument list
-
-        pid=fork();
-        if (pid < 0){ //error creating child process
-            printf("Error creating the child process\n");
-        } else if (pid==0){ //Child process
-          printf("I'm the child %d\n", getpid());
-          if(execvp(*argv, argv)<0){ //Program execution error
-              printf("Program not found below is the detail\n");
-              for (i=0; argv[i] != NULL; i++) {
-                printf("argv[%d]=%s%s", i, argv[i], (argv[i+1]==NULL)?"\n":", ");
-              }
-            } else{ //Program is runing
-              printf("Child: program is runing...\n");
-            }
-        } else {//parent process
-            printf("I'm the parent %d\n", getpid());
-            if (bg) {
-              //wait
-              printf("background job requested\n");
-            }
+  int i, bg;
+  pid_t pid = NULL;
+  char *argv[MAXARGS];
+  bg = parseline(cmdline, argv);
+  if (!builtin_cmd(argv)) {
+    //print out argument list
+    pid = fork();
+    if (pid < 0) { //error creating child process
+      printf("Error creating the child process\n");
+    } else if (pid == 0) { //Child process
+//      printf("I'm the child %d\n", getpid());
+      if (execvp(*argv, argv) < 0) { //Program execution error
+        printf("%s: Command not found\n", argv[0]);
+        for (i = 0; argv[i] != NULL; i++) {
+          printf("argv[%d]=%s%s", i, argv[i], (argv[i + 1] == NULL) ? "\n" : ", ");
         }
+      } else { //Program is runing
+      }
+    } else {//Parent process
+//      printf("I'm the parent %d\n", getpid());
+      if (bg) { //background job
+        addjob(jobs, pid, BG, cmdline);
+//        printf("background job requested\n");
+      } else { //foreground job
+        addjob(jobs, pid, FG, cmdline);
+        waitfg(pid);
+      }
     }
+  }
   return;
 }
 
@@ -275,6 +275,10 @@ void do_bgfg(char **argv)
  */
 void waitfg(pid_t pid)
 {
+  struct job_t *fjob;
+  while((fjob = getjobpid(jobs, pid)) != NULL && fjob->state==FG){
+    //wait
+  }
   return;
 }
 
@@ -291,9 +295,14 @@ void waitfg(pid_t pid)
  */
 void sigchld_handler(int sig) 
 {
-    printf("SIGCHLD received\n");
-    wait(NULL);
-    return;
+  pid_t cpid;
+//  printf("SIGCHLD called\n");
+  while((cpid = waitpid(-1, NULL, WNOHANG))>0){
+//    printf("Reaped child %d", cpid);
+    clearjob(getjobpid(jobs, cpid));
+  }
+//  printf("child PID %d", cpid);
+  return;
 }
 
 /* 
@@ -303,7 +312,10 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig) 
 {
-    printf("SIGINT received\n");
+  kill(-getpid(), SIGKILL);
+
+  printf("SIGINT received\n");
+//  exit(0);
   return;
 }
 
@@ -315,7 +327,6 @@ void sigint_handler(int sig)
 void sigtstp_handler(int sig) 
 {
     printf("SIGSTP received\n");
-    return;
 }
 
 /*********************

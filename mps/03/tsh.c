@@ -257,23 +257,34 @@ int parseline(const char *cmdline, char **argv)
  * builtin_cmd - If the user has typed a built-in command then execute
  *    it immediately.  
  */
-int builtin_cmd(char **argv) 
-{
-    if(!strcmp(argv[0],"quit")){            //quit: terminates the shell.
-      printf("quit\n");
-      return 1;                             //is a builtin command
-    } else if(!strcmp(argv[0],"jobs")){     //jobs: lists all background jobs.
-      listjobs(jobs);
-      return 1;
-    } else if(!strcmp(argv[0],"bg")){       //bg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the background. The <job> argument can be either a PID or a JID.
-      printf("bg\n");
-      return 1;
-    } else if(!strcmp(argv[0],"fg")){       //fg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the foreground. The <job> argument can be either a PID or a JID.
-      printf("fg\n");
-      return 1;
-    } else {
-        return 0;                           /* not a builtin command */
+int builtin_cmd(char **argv) {
+  if (!strcmp(argv[0], "quit")) {            //quit: terminates the shell.
+    printf("quit\n");
+    return 1;                             //is a builtin command
+  } else if (!strcmp(argv[0], "jobs")) {     //jobs: lists all background jobs.
+    listjobs(jobs);
+    return 1;
+  } else if (!strcmp(argv[0], "bg")) {       //bg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the background. The <job> argument can be either a PID or a JID.
+    printf("bg\n");
+    return 1;
+  } else if (!strcmp(argv[0], "fg")) {       //fg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the foreground. The <job> argument can be either a PID or a JID.
+    struct job_t *job;
+    //Get the job from given the ID
+    if (argv[1][0] == '%') {                  //JID is given
+      job = getjobjid(jobs, atoi(&argv[1][1]));
+    } else {                              //PID is given
+      job = getjobpid(jobs, atoi(&argv[1][0]));
     }
+    if (job != NULL) {                        //if a valid PID or JID is given
+      kill(job->pid, SIGCONT);            //send SIGCONT signal to the job
+      job->state = FG;
+      waitfg(job->pid);
+      return 1;
+    }
+    return 1;
+  } else {
+    return 0;                           /* not a builtin command */
+  }
 }
 
 /* 
@@ -483,7 +494,7 @@ void listjobs(struct job_t *jobs)
       case BG: 
         printf("Running ");
         break;
-      case FG: 
+      case FG:
         printf("Foreground ");
         break;
       case ST: 

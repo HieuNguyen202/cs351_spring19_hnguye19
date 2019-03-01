@@ -259,8 +259,7 @@ int parseline(const char *cmdline, char **argv)
  */
 int builtin_cmd(char **argv) {
   if (!strcmp(argv[0], "quit")) {            //quit: terminates the shell.
-    printf("quit\n");
-    return 1;                             //is a builtin command
+    builtin_cmd_quit();
   } else if (!strcmp(argv[0], "jobs")) {     //jobs: lists all background jobs.
     listjobs(jobs);
     return 1;
@@ -296,6 +295,24 @@ int builtin_cmd_fgbg(char **argv, int state) {
       }
   }
   return 1;
+}
+
+int builtin_cmd_quit() {
+  //Terminal all children and grandchildren first
+  for (int i = 0; i < MAXJOBS; i++) {
+    if (jobs[i].pid != 0) {
+      kill(jobs[i].pid, SIGKILL);      //Terminal the child's group
+    }
+  }
+  //Wait for all child to be reaped
+  int i = 0;
+  while(i < MAXJOBS){
+    if(jobs[i].pid==0){
+      i++;
+    }
+  }
+  //Terminate the shell
+  exit(0);
 }
 
 /* 

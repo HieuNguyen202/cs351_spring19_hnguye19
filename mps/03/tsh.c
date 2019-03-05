@@ -175,6 +175,7 @@ void eval(char *cmdline) {
       printf("Error creating the child process\n");
     } else if (pid == 0) { //Child process
 //      printf("I'm the child %d\n", getpid());
+        setpgrp();
       if (execlp(*argv, argv) < 0) { //Program execution error
         printf("%s: Command not found\n", argv[0]);
         for (i = 0; argv[i] != NULL; i++) {
@@ -367,7 +368,7 @@ void sigint_handler(int sig)
 {
   kill(-getpid(), SIGKILL);
 
-  printf("SIGINT received\n");
+//  printf("SIGINT received\n");
 //  exit(0);
   return;
 }

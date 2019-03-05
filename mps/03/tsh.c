@@ -368,7 +368,10 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig) 
 {
-  kill(-getpid(), SIGKILL);
+  pid_t pid = fgpid(jobs);
+  struct job_t *job = getjobpid(jobs, pid);
+  printf("[%d] (%d) terminated by signal %d\n", job->jid, job->pid, sig);
+  kill(-pid, SIGKILL);
 
 //  printf("SIGINT received\n");
 //  exit(0);

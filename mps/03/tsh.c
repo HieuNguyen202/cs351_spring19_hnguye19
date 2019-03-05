@@ -354,7 +354,7 @@ void sigchld_handler(int sig)
   pid_t cpid;
 //  printf("SIGCHLD called\n");
   while((cpid = waitpid(-1, NULL, WNOHANG))>0){
-//    printf("Reaped child %d", cpid);
+    printf("Reaped child %d", cpid);
     clearjob(getjobpid(jobs, cpid));
   }
 //  printf("child PID %d", cpid);
@@ -369,13 +369,14 @@ void sigchld_handler(int sig)
 void sigint_handler(int sig) 
 {
   pid_t pid = fgpid(jobs);
+  if(pid == 0){
+      return;
+  }
   struct job_t *job = getjobpid(jobs, pid);
   printf("[%d] (%d) terminated by signal %d\n", job->jid, job->pid, sig);
   kill(-pid, SIGKILL);
-
 //  printf("SIGINT received\n");
 //  exit(0);
-  return;
 }
 
 /*

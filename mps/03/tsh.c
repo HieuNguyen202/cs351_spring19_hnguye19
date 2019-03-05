@@ -187,6 +187,8 @@ void eval(char *cmdline) {
 //      printf("I'm the parent %d\n", getpid());
       if (bg) { //background job
         addjob(jobs, pid, BG, cmdline);
+        struct job_t job = getjobpid(pid);
+        printf("[%d] (%d) %s", job.jid, job.pid, job.cmdline);
 //        printf("background job requested\n");
       } else { //foreground job
         addjob(jobs, pid, FG, cmdline);

@@ -432,9 +432,11 @@ int addjob(struct job_t *jobs, pid_t pid, int state, char *cmdline)
     if (jobs[i].pid == 0) {
       jobs[i].pid = pid;
       jobs[i].state = state;
-      jobs[i].jid = nextjid++;
-      if (nextjid > MAXJOBS)
-        nextjid = 1;
+      jobs[i].jid = i + 1;
+
+//      jobs[i].jid = nextjid++;
+//      if (nextjid > MAXJOBS)
+//        nextjid = 1;
       strcpy(jobs[i].cmdline, cmdline);
       if(verbose){
         printf("Added job [%d] %d %s\n", jobs[i].jid, jobs[i].pid, jobs[i].cmdline);

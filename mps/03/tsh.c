@@ -354,7 +354,7 @@ void sigchld_handler(int sig)
   pid_t cpid;
 //  printf("SIGCHLD called\n");
   while((cpid = waitpid(-1, NULL, WNOHANG))>0){
-    printf("Reaped child %d", cpid);
+//    printf("Reaped child %d", cpid);
     clearjob(getjobpid(jobs, cpid));
   }
 //  printf("child PID %d", cpid);

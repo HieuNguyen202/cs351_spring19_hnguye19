@@ -284,15 +284,15 @@ int builtin_cmd_fgbg(char **argv, int state) {
     job = getjobpid(jobs, atoi(&argv[1][0]));
   }
   if (job != NULL) {                        //if a valid PID or JID is given
-      if(state==FG){
-          //Bring current fg job to background
+      if(state==FG){                        //If is fg built-in command
+          //Bring current fg job to background, to allow the target process run on foreground
           struct job_t *curr_fg_job;
           if((curr_fg_job = getjobpid(jobs, fgpid(jobs))) != NULL){
               curr_fg_job->state = BG;
           }
       }
       job->state = state;
-      kill(job->pid, SIGCONT);                //send SIGCONT signal to the job
+      kill(-job->pid, SIGCONT);                //send SIGCONT signal to the job
       if(state == FG){
           waitfg(job->pid);
       }

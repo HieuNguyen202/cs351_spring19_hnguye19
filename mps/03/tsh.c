@@ -276,15 +276,42 @@ int builtin_cmd(char **argv) {
 }
 
 int builtin_cmd_fgbg(char **argv, int state) {
-  struct job_t *job;
-  //Get the job from given the ID
-  if (argv[1][0] == '%') {                  //JID is given
-    job = getjobjid(jobs, atoi(&argv[1][1]));
-  } else {                                  //PID is given
-    job = getjobpid(jobs, atoi(&argv[1][0]));
-  }
-  if (job != NULL) {                        //if a valid PID or JID is given
-      if(state==FG){                        //If is fg built-in command
+
+    //If no argument is given, yell at user and return!
+    if (argv[1] == NULL) {                  //JID is given
+        printf("%s command requires PID or %cjobid argument\n", state == BG ? "bg" : "fg", '%');
+        return 1;                           //Although invalid, but still a built-in command
+    }
+
+    int isJID = argv[1][0] == '%';
+
+    //Extract the number part of the PID/JID
+    char *idChars = isJID ? &argv[1][1] : &argv[1][0];
+    char *tempIdChars = idChars;
+
+    //Making sure every char in id is a decimal digit (in ASCII format)
+    while (*tempIdChars != NULL){
+        if(*tempIdChars < '0' || *tempIdChars > '9'){
+            printf("%s: argument must be a PID or %cjobid\n", state == BG ? "bg" : "fg", '%');
+            return 1;
+        }
+        tempIdChars++;
+    }
+
+    int id = atoi(idChars);
+
+    //Get the job from given the ID
+    struct job_t *job = isJID ? getjobjid(jobs, id) : getjobpid(jobs, id);
+
+    if (job == NULL) {               //if a valid PID or JID is given
+        if(isJID){
+            printf("%c%d: No such job\n", '%', id);
+        } else {
+            printf("(%d): No such process\n", id);
+        }
+        return 1;
+    } else {                        //if a valid PID or JID is given
+      if(state==FG){                //If is fg built-in command
           //Bring current fg job to background, to allow the target process run on foreground
           struct job_t *curr_fg_job;
           if((curr_fg_job = getjobpid(jobs, fgpid(jobs))) != NULL){
@@ -297,7 +324,7 @@ int builtin_cmd_fgbg(char **argv, int state) {
           waitfg(job->pid);
       }
   }
-  return 1;
+  return 1;                                     //is a built-in command
 }
 
 int builtin_cmd_quit() {

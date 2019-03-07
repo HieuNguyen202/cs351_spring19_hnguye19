@@ -178,9 +178,6 @@ void eval(char *cmdline) {
       setpgid(0,0);
       if (execvp(*argv, argv) < 0) { //Program execution error
         printf("%s: Command not found\n", argv[0]);
-        for (i = 0; argv[i] != NULL; i++) {
-          printf("argv[%d]=%s%s", i, argv[i], (argv[i + 1] == NULL) ? "\n" : ", ");
-        }
       } else { //Program is runing
       }
     } else {//Parent process

@@ -264,16 +264,38 @@ int builtin_cmd(char **argv) {
     listjobs(jobs);
     return 1;
   } else if (!strcmp(argv[0], "bg")) {       //bg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the background. The <job> argument can be either a PID or a JID.
-    return builtin_cmd_fgbg(argv, BG);
+    return do_bgfg(argv, BG);
   } else if (!strcmp(argv[0], "fg")) {       //fg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the foreground. The <job> argument can be either a PID or a JID.
-    return builtin_cmd_fgbg(argv, FG);
+    return do_bgfg(argv, FG);
   } else {
     return 0;                           /* not a builtin command */
   }
 }
 
-int builtin_cmd_fgbg(char **argv, int state) {
 
+int builtin_cmd_quit() {
+  //Terminal all children and grandchildren first
+  for (int i = 0; i < MAXJOBS; i++) {
+    if (jobs[i].pid != 0) {
+      kill(jobs[i].pid, SIGKILL);      //Terminal the child's group
+    }
+  }
+  //Wait for all child to be reaped
+  int i = 0;
+  while(i < MAXJOBS){
+    if(jobs[i].pid==0){
+      i++;
+    }
+  }
+  //Terminate the shell
+  exit(0);
+}
+
+/* 
+ * do_bgfg - Execute the builtin bg and fg commands
+ */
+void do_bgfg(char **argv, int state)
+{
     //If no argument is given, yell at user and return!
     if (argv[1] == NULL) {                  //JID is given
         printf("%s command requires PID or %cjobid argument\n", state == BG ? "bg" : "fg", '%');
@@ -308,46 +330,20 @@ int builtin_cmd_fgbg(char **argv, int state) {
         }
         return 1;
     } else {                        //if a valid PID or JID is given
-      if(state==FG){                //If is fg built-in command
-          //Bring current fg job to background, to allow the target process run on foreground
-          struct job_t *curr_fg_job;
-          if((curr_fg_job = getjobpid(jobs, fgpid(jobs))) != NULL){
-              curr_fg_job->state = BG;
-          }
-      }
-      job->state = state;
-      kill(-job->pid, SIGCONT);                //send SIGCONT signal to the job
-      if(state == FG){
-          waitfg(job->pid);
-      }
-  }
-  return 1;                                     //is a built-in command
-}
-
-int builtin_cmd_quit() {
-  //Terminal all children and grandchildren first
-  for (int i = 0; i < MAXJOBS; i++) {
-    if (jobs[i].pid != 0) {
-      kill(jobs[i].pid, SIGKILL);      //Terminal the child's group
+        if(state==FG){                //If is fg built-in command
+            //Bring current fg job to background, to allow the target process run on foreground
+            struct job_t *curr_fg_job;
+            if((curr_fg_job = getjobpid(jobs, fgpid(jobs))) != NULL){
+                curr_fg_job->state = BG;
+            }
+        }
+        job->state = state;
+        kill(-job->pid, SIGCONT);                //send SIGCONT signal to the job
+        if(state == FG){
+            waitfg(job->pid);
+        }
     }
-  }
-  //Wait for all child to be reaped
-  int i = 0;
-  while(i < MAXJOBS){
-    if(jobs[i].pid==0){
-      i++;
-    }
-  }
-  //Terminate the shell
-  exit(0);
-}
-
-/* 
- * do_bgfg - Execute the builtin bg and fg commands
- */
-void do_bgfg(char **argv) 
-{
-  return;
+    return 1;
 }
 
 /* 

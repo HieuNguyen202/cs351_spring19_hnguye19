@@ -55,7 +55,7 @@ struct job_t jobs[MAXJOBS]; /* The job list */
 /* Here are the functions that you will implement */
 void eval(char *cmdline);
 int builtin_cmd(char **argv);
-void do_bgfg(char **argv);
+void do_bgfg(char **argv, int state);
 void waitfg(pid_t pid);
 
 void sigchld_handler(int sig);
@@ -258,18 +258,18 @@ int parseline(const char *cmdline, char **argv)
  *    it immediately.  
  */
 int builtin_cmd(char **argv) {
-  if (!strcmp(argv[0], "quit")) {            //quit: terminates the shell.
-    builtin_cmd_quit();
+  if (!strcmp(argv[0], "quit")) {            //quit: terminates the shell
+    builtin_cmd_quit();                      //This does not return
   } else if (!strcmp(argv[0], "jobs")) {     //jobs: lists all background jobs.
     listjobs(jobs);
-    return 1;
   } else if (!strcmp(argv[0], "bg")) {       //bg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the background. The <job> argument can be either a PID or a JID.
-    return do_bgfg(argv, BG);
+    do_bgfg(argv, BG);
   } else if (!strcmp(argv[0], "fg")) {       //fg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the foreground. The <job> argument can be either a PID or a JID.
-    return do_bgfg(argv, FG);
+    do_bgfg(argv, FG);
   } else {
-    return 0;                           /* not a builtin command */
+    return 0;                                //not a builtin command
   }
+  return 1;                                  //is a builtin command
 }
 
 
@@ -299,7 +299,7 @@ void do_bgfg(char **argv, int state)
     //If no argument is given, yell at user and return!
     if (argv[1] == NULL) {                  //JID is given
         printf("%s command requires PID or %cjobid argument\n", state == BG ? "bg" : "fg", '%');
-        return 1;                           //Although invalid, but still a built-in command
+        return;                           //Although invalid, but still a built-in command
     }
 
     int isJID = argv[1][0] == '%';
@@ -312,7 +312,7 @@ void do_bgfg(char **argv, int state)
     while (*tempIdChars != NULL){
         if(*tempIdChars < '0' || *tempIdChars > '9'){
             printf("%s: argument must be a PID or %cjobid\n", state == BG ? "bg" : "fg", '%');
-            return 1;
+            return;
         }
         tempIdChars++;
     }
@@ -328,7 +328,7 @@ void do_bgfg(char **argv, int state)
         } else {
             printf("(%d): No such process\n", id);
         }
-        return 1;
+        return;
     } else {                        //if a valid PID or JID is given
         if(state==FG){                //If is fg built-in command
             //Bring current fg job to background, to allow the target process run on foreground
@@ -343,7 +343,6 @@ void do_bgfg(char **argv, int state)
             waitfg(job->pid);
         }
     }
-    return 1;
 }
 
 /* 

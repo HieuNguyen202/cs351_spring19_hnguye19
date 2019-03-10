@@ -377,13 +377,17 @@ void sigchld_handler(int sig) {
     pid_t cpid;
     printf("Child SIGCHLD\n");
     while ((cpid = waitpid(-1, &status, WNOHANG)) > 0) {
-        if(WIFSTOPPED(status)){
-            printf("Child %d stopped\n", cpid);
+        if (WIFEXITED(status)) {
+            printf("Child %d exited normally.\n", cpid);
+        } else if (WIFSIGNALED(status)) {
+            printf("Child %d exited because of signal not caught.\n", cpid);
+        } else if (WIFSTOPPED(status)) {
+            printf("Child %d stopped.\n", cpid);
         }
         clearjob(getjobpid(jobs, cpid));
     }
-    return;
 }
+
 
 /* 
  * sigint_handler - The kernel sends a SIGINT to the shell whenver the

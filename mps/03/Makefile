@@ -89,6 +89,8 @@ rtest15:
 	$(DRIVER) -t trace15.txt -s $(TSHREF) -a $(TSHARGS)
 rtest16:
 	$(DRIVER) -t trace16.txt -s $(TSHREF) -a $(TSHARGS)
+rtest17:
+	$(DRIVER) -t trace17.txt -s $(TSHREF) -a $(TSHARGS)
 
 # clean up
 clean:

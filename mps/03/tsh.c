@@ -181,8 +181,8 @@ void eval(char *cmdline) {
         } else if (pid == 0) { //Child process
             sigprocmask(SIG_UNBLOCK, &mask, NULL);                          //Unblock child's SIGCHLD
             setpgid(0, 0);                                                  //Set the child to be the group leader
-//            if (execvp(*argv, argv) < 0) {                                  //Program execution error
-            if (execve(*argv, argv, environ) < 0) {                                  //Program execution error
+            if (execvp(*argv, argv) < 0) {                                  //Program execution error
+//            if (execve(*argv, argv, environ) < 0) {                                  //Program execution error
                 printf("%s: Command not found\n", argv[0]);
                 exit(1);                                                    //Exit the child process
             }
@@ -377,26 +377,19 @@ void sigchld_handler(int sig) {
     int status;
     pid_t cpid;
     struct job_t *job;
-//    printf("Child SIGCHLD\n");
-    while ((cpid = waitpid(-1, &status, WNOHANG)) > 0) {
+    while ((cpid = waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0) {
         job = getjobpid(jobs, cpid);
-        if(sig == SIGTSTP){
-            job->state = ST;
-            printf("Job [%d] (%d) stoped by signal %d\n", job->jid, job->pid, sig);
-        } else if (sig == SIGINT){
-            printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, sig);
+        if (WIFEXITED(status)) {
             clearjob(job);
         }
-//        if (WIFEXITED(status)) {
-//            printf("Child %d exited normally with signal %d.\n", cpid, sig);
-//        }
-//        if (WIFSIGNALED(status)) {
-//            printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, sig);
-//            printf("Child %d exited because of signal not caught.\n", cpid);
-//        }
-//        if (WIFSTOPPED(status)) {
-//            printf("Child %d stopped.\n", cpid);
-//        }
+        if (WIFSTOPPED(status)) {
+            printf("Job [%d] (%d) stopped by signal %d\n", job->jid, job->pid, WSTOPSIG(status));
+            job->state = ST;
+        }
+        if (WIFSIGNALED(status)) {
+            printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, WTERMSIG(status));
+            clearjob(job);
+        }
     }
 }
 
@@ -409,7 +402,7 @@ void sigint_handler(int sig)
 {
   pid_t pid;
   if((pid = fgpid(jobs)) != 0){     //if there is a fg process running.
-      kill(-pid, SIGKILL);
+      kill(-pid, sig);
   }
 }
 
@@ -422,7 +415,7 @@ void sigtstp_handler(int sig)
 {
     pid_t pid;
     if((pid = fgpid(jobs)) != 0){     //if there is a fg process running.
-        kill(-pid, SIGTSTP);
+        kill(-pid, sig);
     }
 }
 

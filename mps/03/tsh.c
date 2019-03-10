@@ -181,7 +181,8 @@ void eval(char *cmdline) {
         } else if (pid == 0) { //Child process
             sigprocmask(SIG_UNBLOCK, &mask, NULL);                          //Unblock child's SIGCHLD
             setpgid(0, 0);                                                  //Set the child to be the group leader
-            if (execvp(*argv, argv) < 0) {                                  //Program execution error
+//            if (execvp(*argv, argv) < 0) {                                  //Program execution error
+            if (execve(*argv, argv, environ) < 0) {                                  //Program execution error
                 printf("%s: Command not found\n", argv[0]);
                 exit(1);                                                    //Exit the child process
             }
@@ -375,16 +376,21 @@ void waitfg(pid_t pid)
 void sigchld_handler(int sig) {
     int status;
     pid_t cpid;
+    struct job_t *job;
     printf("Child SIGCHLD\n");
     while ((cpid = waitpid(-1, &status, WNOHANG)) > 0) {
+        job = getjobpid(jobs, cpid);
         if (WIFEXITED(status)) {
             printf("Child %d exited normally.\n", cpid);
         } else if (WIFSIGNALED(status)) {
+            printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, sig);
             printf("Child %d exited because of signal not caught.\n", cpid);
         } else if (WIFSTOPPED(status)) {
             printf("Child %d stopped.\n", cpid);
+        } else {
+            printf("None of the above %d.\n", cpid);
         }
-        clearjob(getjobpid(jobs, cpid));
+        clearjob(job);
     }
 }
 
@@ -396,13 +402,10 @@ void sigchld_handler(int sig) {
  */
 void sigint_handler(int sig) 
 {
-  pid_t pid = fgpid(jobs);
-  if(pid == 0){
-      return;
+  pid_t pid;
+  if((pid = fgpid(jobs)) != 0){     //if there is a fg process running.
+      kill(-pid, SIGKILL);
   }
-  struct job_t *job = getjobpid(jobs, pid);
-  printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, sig);
-  kill(-pid, SIGKILL);
 }
 
 /*

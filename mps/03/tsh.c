@@ -372,16 +372,16 @@ void waitfg(pid_t pid)
  *     available zombie children, but doesn't wait for any other
  *     currently running children to terminate.  
  */
-void sigchld_handler(int sig) 
-{
-  pid_t cpid;
-//  printf("SIGCHLD called\n");
-  while((cpid = waitpid(-1, NULL, WNOHANG))>0){
-//    printf("Reaped child %d", cpid);
-    clearjob(getjobpid(jobs, cpid));
-  }
-//  printf("child PID %d", cpid);
-  return;
+void sigchld_handler(int sig) {
+    int status;
+    pid_t cpid;
+    while ((cpid = waitpid(-1, &status, WNOHANG)) > 0) {
+        if(WSTOPPED(status)){
+            printf("Child %d stopped", cpid);
+        }
+        clearjob(getjobpid(jobs, cpid));
+    }
+    return;
 }
 
 /* 

@@ -377,23 +377,28 @@ void sigchld_handler(int sig) {
     int status;
     pid_t cpid;
     struct job_t *job;
-    printf("Child SIGCHLD\n");
+//    printf("Child SIGCHLD\n");
     while ((cpid = waitpid(-1, &status, WNOHANG)) > 0) {
         job = getjobpid(jobs, cpid);
-        if (WIFEXITED(status)) {
-            printf("Child %d exited normally.\n", cpid);
-        } else if (WIFSIGNALED(status)) {
+        if(sig == SIGTSTP){
+            job->state = ST;
+            printf("Job [%d] (%d) stoped by signal %d\n", job->jid, job->pid, sig);
+        } else if (sig == SIGINT){
             printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, sig);
-            printf("Child %d exited because of signal not caught.\n", cpid);
-        } else if (WIFSTOPPED(status)) {
-            printf("Child %d stopped.\n", cpid);
-        } else {
-            printf("None of the above %d.\n", cpid);
+            clearjob(job);
         }
-        clearjob(job);
+//        if (WIFEXITED(status)) {
+//            printf("Child %d exited normally with signal %d.\n", cpid, sig);
+//        }
+//        if (WIFSIGNALED(status)) {
+//            printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, sig);
+//            printf("Child %d exited because of signal not caught.\n", cpid);
+//        }
+//        if (WIFSTOPPED(status)) {
+//            printf("Child %d stopped.\n", cpid);
+//        }
     }
 }
-
 
 /* 
  * sigint_handler - The kernel sends a SIGINT to the shell whenver the
@@ -415,14 +420,10 @@ void sigint_handler(int sig)
  */
 void sigtstp_handler(int sig) 
 {
-  pid_t pid = fgpid(jobs);
-  if(pid == 0){
-    return;
-  }
-  struct job_t *job = getjobpid(jobs, pid);
-  job->state = ST;
-  printf("Job [%d] (%d) stoped by signal %d\n", job->jid, job->pid, sig);
-  kill(-pid, SIGTSTP);
+    pid_t pid;
+    if((pid = fgpid(jobs)) != 0){     //if there is a fg process running.
+        kill(-pid, SIGTSTP);
+    }
 }
 
 /*********************

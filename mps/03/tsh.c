@@ -376,7 +376,7 @@ void sigchld_handler(int sig) {
     int status;
     pid_t cpid;
     while ((cpid = waitpid(-1, &status, WNOHANG)) > 0) {
-        if(WSTOPPED(status)){
+        if(WIFSTOPPED(status)){
             printf("Child %d stopped", cpid);
         }
         clearjob(getjobpid(jobs, cpid));

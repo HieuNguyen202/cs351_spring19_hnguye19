@@ -306,13 +306,10 @@ void do_bgfg(char **argv, int state)
         printf("%s command requires PID or %cjobid argument\n", state == BG ? "bg" : "fg", '%');
         return;                           //Although invalid, but still a built-in command
     }
-
     int isJID = argv[1][0] == '%';
-
     //Extract the number part of the PID/JID
     char *idChars = isJID ? &argv[1][1] : &argv[1][0];
     char *tempIdChars = idChars;
-
     //Making sure every char in id is a decimal digit (in ASCII format)
     while (*tempIdChars != NULL){
         if(*tempIdChars < '0' || *tempIdChars > '9'){
@@ -321,31 +318,30 @@ void do_bgfg(char **argv, int state)
         }
         tempIdChars++;
     }
-
     int id = atoi(idChars);
 
     //Get the job from given the ID
     struct job_t *job = isJID ? getjobjid(jobs, id) : getjobpid(jobs, id);
 
-    if (job == NULL) {               //if a valid PID or JID is given
+    if (job == NULL) {                  //if a valid PID or JID is given
         if(isJID){
             printf("%c%d: No such job\n", '%', id);
         } else {
             printf("(%d): No such process\n", id);
         }
         return;
-    } else {                        //if a valid PID or JID is given
-        if(state==FG){                //If is fg built-in command
+    } else {                            //if a valid PID or JID is given
+        if (state == FG) {              //If is fg built-in command
             //Bring current fg job to background, to allow the target process run on foreground
             struct job_t *curr_fg_job;
-            if((curr_fg_job = getjobpid(jobs, fgpid(jobs))) != NULL){
+            if ((curr_fg_job = getjobpid(jobs, fgpid(jobs))) != NULL)
                 curr_fg_job->state = BG;
-            }
-        }
-        job->state = state;
-        kill(-job->pid, SIGCONT);                //send SIGCONT signal to the job
-        if(state == FG){
+            job->state = FG;            //Set the target job state to either FG or BG
             waitfg(job->pid);
+        } else if (state == BG) {       //If is bg built-in command
+            job->state = BG;            //Set the target job state to either FG or BG
+            printf("[%d] (%d) %s\n", job->jid, job->pid, job->cmdline);
+            kill(-(job->pid), SIGCONT); //send SIGCONT signal to the job
         }
     }
 }

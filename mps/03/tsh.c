@@ -149,6 +149,11 @@ int main(int argc, char **argv)
 
   exit(0); /* control never reaches here */
 }
+
+void chld_sigint_handler(int sig){
+    printf("chld_sigint_handler");
+}
+
   
 /* 
  * eval - Evaluate the command line that the user has just typed in
@@ -181,14 +186,13 @@ void eval(char *cmdline) {
         } else if (pid == 0) { //Child process
             sigprocmask(SIG_UNBLOCK, &mask, NULL);                          //Unblock child's SIGCHLD
             setpgid(0, 0);
+            Signal(SIGINT,  chld_sigint_handler);   /* ctrl-c */
             if (execvp(*argv, argv) < 0) { //Program execution error
                 printf("%s: Command not found\n", argv[0]);
                 exit(1);                                                    //Exit the child process
-            } else { //Program is runing
             }
         } else {//Parent process
             addjob(jobs, pid, bg? BG : FG, cmdline);
-
             if (bg) { //background job
                 struct job_t *job = getjobpid(jobs, pid);
                 printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);

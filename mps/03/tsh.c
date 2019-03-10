@@ -152,9 +152,11 @@ int main(int argc, char **argv)
 
 void chld_sigint_handler(int sig){
     printf("chld_sigint_handler");
+    exit(1);
 }
 void chld_sigtstp_handler(int sig){
     printf("chld_sigtstp_handler");
+    exit(1);
 }
 
   

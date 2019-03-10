@@ -149,16 +149,6 @@ int main(int argc, char **argv)
 
   exit(0); /* control never reaches here */
 }
-
-void chld_sigint_handler(int sig){
-    printf("chld_sigint_handler");
-    exit(1);
-}
-void chld_sigtstp_handler(int sig){
-    printf("chld_sigtstp_handler");
-    exit(1);
-}
-
   
 /* 
  * eval - Evaluate the command line that the user has just typed in
@@ -190,11 +180,8 @@ void eval(char *cmdline) {
             sigprocmask(SIG_UNBLOCK, &mask, NULL);                          //Unblock SIGCHLD if fork() fails
         } else if (pid == 0) { //Child process
             sigprocmask(SIG_UNBLOCK, &mask, NULL);                          //Unblock child's SIGCHLD
-            setpgid(0, 0);
-            Signal(SIGINT,  chld_sigint_handler);   /* ctrl-c */
-            Signal(SIGTSTP,  chld_sigtstp_handler);   /* ctrl-c */
-
-            if (execvp(*argv, argv) < 0) { //Program execution error
+            setpgid(0, 0);                                                  //Set the child to be the group leader
+            if (execvp(*argv, argv) < 0) {                                  //Program execution error
                 printf("%s: Command not found\n", argv[0]);
                 exit(1);                                                    //Exit the child process
             }

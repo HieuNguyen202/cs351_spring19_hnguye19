@@ -183,6 +183,7 @@ void eval(char *cmdline) {
             setpgid(0, 0);
             if (execvp(*argv, argv) < 0) { //Program execution error
                 printf("%s: Command not found\n", argv[0]);
+                exit(1);                                                    //Exit the child process
             } else { //Program is runing
             }
         } else {//Parent process

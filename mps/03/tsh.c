@@ -162,38 +162,43 @@ int main(int argc, char **argv)
  * when we type ctrl-c (ctrl-z) at the keyboard.  
  */
 void eval(char *cmdline) {
-  /* the following code demonstrates how to use parseline --- you'll 
-   * want to replace most of it (at least the print statements). */
-  int i, bg;
-  pid_t pid = NULL;
-  char *argv[MAXARGS];
-  bg = parseline(cmdline, argv);
-  if (!builtin_cmd(argv)) {
-    //print out argument list
-    pid = fork();
-    if (pid < 0) { //error creating child process
-      printf("Error creating the child process\n");
-    } else if (pid == 0) { //Child process
-//      printf("I'm the child %d\n", getpid());
-      setpgid(0,0);
-      if (execvp(*argv, argv) < 0) { //Program execution error
-        printf("%s: Command not found\n", argv[0]);
-      } else { //Program is runing
-      }
-    } else {//Parent process
-//      printf("I'm the parent %d\n", getpid());
-      if (bg) { //background job
-        addjob(jobs, pid, BG, cmdline);
-        struct job_t *job = getjobpid(jobs, pid);
-        printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
-//        printf("background job requested\n");
-      } else { //foreground job
-        addjob(jobs, pid, FG, cmdline);
-        waitfg(pid);
-      }
+    /* the following code demonstrates how to use parseline --- you'll
+     * want to replace most of it (at least the print statements). */
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGCHLD);
+
+    int i, bg;
+    pid_t pid = NULL;
+    char *argv[MAXARGS];
+    bg = parseline(cmdline, argv);
+    if (!builtin_cmd(argv)) {
+        sigprocmask(SIG_BLOCK, &mask, NULL);                                //Block SIGCHLD
+        //print out argument list
+        if ((pid = fork()) < 0) { //error creating child process
+            printf("Error creating the child process\n");
+            sigprocmask(SIG_UNBLOCK, &mask, NULL);                          //Unblock SIGCHLD if fork() fails
+        } else if (pid == 0) { //Child process
+            sigprocmask(SIG_UNBLOCK, &mask, NULL);                          //Unblock child's SIGCHLD
+            setpgid(0, 0);
+            if (execvp(*argv, argv) < 0) { //Program execution error
+                printf("%s: Command not found\n", argv[0]);
+            } else { //Program is runing
+            }
+        } else {//Parent process
+            addjob(jobs, pid, bg? BG : FG, cmdline);
+
+            if (bg) { //background job
+                struct job_t *job = getjobpid(jobs, pid);
+                printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
+                sigprocmask(SIG_UNBLOCK, &mask, NULL);                      //Unblock SIGCHLD after the message is output
+            } else { //foreground job
+                sigprocmask(SIG_UNBLOCK, &mask, NULL);                      //Unblock SIGCHLD before wait for fg process
+                waitfg(pid);
+            }
+        }
     }
-  }
-  return;
+    return;
 }
 
 /* 

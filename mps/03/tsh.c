@@ -265,7 +265,6 @@ int parseline(const char *cmdline, char **argv)
 int builtin_cmd(char **argv) {
   if (!strcmp(argv[0], "quit")) {            //quit: terminates the shell
     exit(0);
-      builtin_cmd_quit();                      //This does not return
   } else if (!strcmp(argv[0], "jobs")) {     //jobs: lists all background jobs.
     listjobs(jobs);
   } else if (!strcmp(argv[0], "bg")) {       //bg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the background. The <job> argument can be either a PID or a JID.
@@ -276,25 +275,6 @@ int builtin_cmd(char **argv) {
     return 0;                                //not a builtin command
   }
   return 1;                                  //is a builtin command
-}
-
-
-int builtin_cmd_quit() {
-  //Terminal all children and grandchildren first
-  for (int i = 0; i < MAXJOBS; i++) {
-    if (jobs[i].pid != 0) {
-      kill(jobs[i].pid, SIGKILL);      //Terminal the child's group
-    }
-  }
-  //Wait for all child to be reaped
-  int i = 0;
-  while(i < MAXJOBS){
-    if(jobs[i].pid==0){
-      i++;
-    }
-  }
-  //Terminate the shell
-  exit(0);
 }
 
 /* 

@@ -340,7 +340,7 @@ void do_bgfg(char **argv, int state)
             waitfg(job->pid);
         } else if (state == BG) {       //If is bg built-in command
             job->state = BG;            //Set the target job state to either FG or BG
-            printf("[%d] (%d) %s\n", job->jid, job->pid, job->cmdline);
+            printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
             kill(-(job->pid), SIGCONT); //send SIGCONT signal to the job
         }
     }

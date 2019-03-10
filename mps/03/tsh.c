@@ -337,6 +337,7 @@ void do_bgfg(char **argv, int state)
             if ((curr_fg_job = getjobpid(jobs, fgpid(jobs))) != NULL)
                 curr_fg_job->state = BG;
             job->state = FG;            //Set the target job state to either FG or BG
+            kill(-(job->pid), SIGCONT); //send SIGCONT signal to the job
             waitfg(job->pid);
         } else if (state == BG) {       //If is bg built-in command
             job->state = BG;            //Set the target job state to either FG or BG

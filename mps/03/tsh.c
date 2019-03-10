@@ -264,7 +264,8 @@ int parseline(const char *cmdline, char **argv)
  */
 int builtin_cmd(char **argv) {
   if (!strcmp(argv[0], "quit")) {            //quit: terminates the shell
-    builtin_cmd_quit();                      //This does not return
+    exit(0);
+      builtin_cmd_quit();                      //This does not return
   } else if (!strcmp(argv[0], "jobs")) {     //jobs: lists all background jobs.
     listjobs(jobs);
   } else if (!strcmp(argv[0], "bg")) {       //bg <job>: restarts <job> by sending it a SIGCONT signal, and then runs it in the background. The <job> argument can be either a PID or a JID.

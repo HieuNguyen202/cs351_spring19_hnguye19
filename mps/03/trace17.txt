@@ -1,9 +1,0 @@
-#
-# trace17.txt - Custom tests by student
-#
-
-#/bin/echo tsh> ./bogus
-./bogus
-
-/bin/echo tsh> ./myspin 10
-

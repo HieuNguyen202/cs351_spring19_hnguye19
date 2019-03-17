@@ -18,6 +18,7 @@ void print_help();  //Print help message
 
 int main()
 {
+    //TODO: add command parser
     print_help();
     printSummary(0, 0, 0);
     return 0;

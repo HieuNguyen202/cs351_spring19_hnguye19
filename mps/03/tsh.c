@@ -165,8 +165,8 @@ void eval(char *cmdline) {
     sigemptyset(&mask);
     sigaddset(&mask, SIGCHLD);
 
-    int i, bg;
-    pid_t pid = NULL;
+    int bg;
+    pid_t pid;
     char *argv[MAXARGS];
     bg = parseline(cmdline, argv);
     if (!builtin_cmd(argv)) {
@@ -285,7 +285,7 @@ void do_bgfg(char **argv, int state)
 
     char *idChars = isJID ? &argv[1][1] : &argv[1][0];  //Extract the number part from the PID/JID string
     char *tempIdChars = idChars;
-    while (*tempIdChars != NULL){                       //Making sure every char in id is a decimal digit (in ASCII format)
+    while (*tempIdChars != '\0'){                       //Making sure every char in id is a decimal digit (in ASCII format)
         if(*tempIdChars < '0' || *tempIdChars > '9'){
             printf("%s: argument must be a PID or %cjobid\n", state == BG ? "bg" : "fg", '%');
             return;

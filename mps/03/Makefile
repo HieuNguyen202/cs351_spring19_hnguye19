@@ -55,6 +55,8 @@ test19:
 	$(DRIVER) -t trace19.txt -s $(TSH) -a $(TSHARGS)
 test20:
 	$(DRIVER) -t trace20.txt -s $(TSH) -a $(TSHARGS)
+testall: test01 test02 test03 test04 test05 test06 test07 test08 test09 test10 test11 test12 test13 test14 test15 test16
+
 
 # Run the tests using the reference shell program
 rtest01:
@@ -91,6 +93,7 @@ rtest16:
 	$(DRIVER) -t trace16.txt -s $(TSHREF) -a $(TSHARGS)
 rtest17:
 	$(DRIVER) -t trace17.txt -s $(TSHREF) -a $(TSHARGS)
+rtestall: rtest01 rtest02 rtest03 rtest04 rtest05 rtest06 rtest07 rtest08 rtest09 rtest10 rtest11 rtest12 rtest13 rtest14 rtest15 rtest16
 
 # clean up
 clean:

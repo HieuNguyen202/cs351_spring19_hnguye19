@@ -49,7 +49,6 @@ struct job_t {              /* The job struct */
 struct job_t jobs[MAXJOBS]; /* The job list */
 /* End global variables */
 
-
 /* Function prototypes */
 
 /* Here are the functions that you will implement */
@@ -162,8 +161,6 @@ int main(int argc, char **argv)
  * when we type ctrl-c (ctrl-z) at the keyboard.  
  */
 void eval(char *cmdline) {
-    /* the following code demonstrates how to use parseline --- you'll
-     * want to replace most of it (at least the print statements). */
     sigset_t mask;
     sigemptyset(&mask);
     sigaddset(&mask, SIGCHLD);
@@ -173,28 +170,26 @@ void eval(char *cmdline) {
     char *argv[MAXARGS];
     bg = parseline(cmdline, argv);
     if (!builtin_cmd(argv)) {
-        sigprocmask(SIG_BLOCK, &mask, NULL);                                //Block SIGCHLD
-        //print out argument list
-        if ((pid = fork()) < 0) { //error creating child process
+        sigprocmask(SIG_BLOCK, &mask, NULL);                //Block SIGCHLD
+        if ((pid = fork()) < 0) {                           //Error creating child process
             printf("Error creating the child process\n");
-            sigprocmask(SIG_UNBLOCK, &mask, NULL);                          //Unblock SIGCHLD if fork() fails
-        } else if (pid == 0) { //Child process
-            sigprocmask(SIG_UNBLOCK, &mask, NULL);                          //Unblock child's SIGCHLD
-            setpgid(0, 0);                                                  //Set the child to be the group leader
-            if (execvp(*argv, argv) < 0) {                                  //Program execution error
-//            if (execve(*argv, argv, environ) < 0) {                                  //Program execution error
+            sigprocmask(SIG_UNBLOCK, &mask, NULL);          //Unblock SIGCHLD if fork() fails
+        } else if (pid == 0) {                              //Child process
+            sigprocmask(SIG_UNBLOCK, &mask, NULL);          //Unblock child's SIGCHLD
+            setpgid(0, 0);                                  //Set the child to be the group leader
+            if (execvp(*argv, argv) < 0) {                  //Run a program
                 printf("%s: Command not found\n", argv[0]);
-                exit(1);                                                    //Exit the child process
+                exit(1);                                    //Exit the child process so the parent will reap it
             }
-        } else {//Parent process
+        } else {                                            //Parent process
             addjob(jobs, pid, bg? BG : FG, cmdline);
-            if (bg) { //background job
+            if (bg) {                                       //background job
                 struct job_t *job = getjobpid(jobs, pid);
                 printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
-                sigprocmask(SIG_UNBLOCK, &mask, NULL);                      //Unblock SIGCHLD after the message is output
-            } else { //foreground job
-                sigprocmask(SIG_UNBLOCK, &mask, NULL);                      //Unblock SIGCHLD before wait for fg process
-                waitfg(pid);
+                sigprocmask(SIG_UNBLOCK, &mask, NULL);      //Unblock SIGCHLD after the message is output
+            } else {                                        //foreground job
+                sigprocmask(SIG_UNBLOCK, &mask, NULL);      //Unblock SIGCHLD before wait for fg process
+                waitfg(pid);                                //Spin until the fg process is done or interrupts
             }
         }
     }
@@ -282,28 +277,23 @@ int builtin_cmd(char **argv) {
  */
 void do_bgfg(char **argv, int state)
 {
-    //If no argument is given, yell at user and return!
-    if (argv[1] == NULL) {                  //JID is given
+    if (argv[1] == NULL) {                //If no argument is given, yell at user and return!
         printf("%s command requires PID or %cjobid argument\n", state == BG ? "bg" : "fg", '%');
         return;                           //Although invalid, but still a built-in command
     }
-    int isJID = argv[1][0] == '%';
-    //Extract the number part of the PID/JID
-    char *idChars = isJID ? &argv[1][1] : &argv[1][0];
+    int isJID = argv[1][0] == '%';        //Whether the given ID is a PID or a JID
+
+    char *idChars = isJID ? &argv[1][1] : &argv[1][0];  //Extract the number part from the PID/JID string
     char *tempIdChars = idChars;
-    //Making sure every char in id is a decimal digit (in ASCII format)
-    while (*tempIdChars != NULL){
+    while (*tempIdChars != NULL){                       //Making sure every char in id is a decimal digit (in ASCII format)
         if(*tempIdChars < '0' || *tempIdChars > '9'){
             printf("%s: argument must be a PID or %cjobid\n", state == BG ? "bg" : "fg", '%');
             return;
         }
         tempIdChars++;
     }
-    int id = atoi(idChars);
-
-    //Get the job from given the ID
-    struct job_t *job = isJID ? getjobjid(jobs, id) : getjobpid(jobs, id);
-
+    int id = atoi(idChars);                             //idChars is confirmed to contain all numeric, convert it to an int
+    struct job_t *job = isJID ? getjobjid(jobs, id) : getjobpid(jobs, id);      //Get the job from given the ID
     if (job == NULL) {                  //if a valid PID or JID is given
         if(isJID){
             printf("%c%d: No such job\n", '%', id);
@@ -318,8 +308,8 @@ void do_bgfg(char **argv, int state)
             if ((curr_fg_job = getjobpid(jobs, fgpid(jobs))) != NULL)
                 curr_fg_job->state = BG;
             job->state = FG;            //Set the target job state to either FG or BG
-            kill(-(job->pid), SIGCONT); //send SIGCONT signal to the job
-            waitfg(job->pid);
+            kill(-(job->pid), SIGCONT); //send SIGCONT signal to the job group
+            waitfg(job->pid);           //Wait for the fg job to finish
         } else if (state == BG) {       //If is bg built-in command
             job->state = BG;            //Set the target job state to either FG or BG
             printf("[%d] (%d) %s", job->jid, job->pid, job->cmdline);
@@ -334,9 +324,7 @@ void do_bgfg(char **argv, int state)
 void waitfg(pid_t pid)
 {
   struct job_t *fjob;
-  while((fjob = getjobpid(jobs, pid)) != NULL && fjob->state==FG){
-    //wait
-  }
+  while((fjob = getjobpid(jobs, pid)) != NULL && fjob->state==FG);  //Just wait
   return;
 }
 
@@ -357,14 +345,14 @@ void sigchld_handler(int sig) {
     struct job_t *job;
     while ((cpid = waitpid(-1, &status, WNOHANG|WUNTRACED)) > 0) {
         job = getjobpid(jobs, cpid);
-        if (WIFEXITED(status)) {
+        if (WIFEXITED(status)) {    //If exited normally by a exit statement
             clearjob(job);
         }
-        if (WIFSTOPPED(status)) {
+        if (WIFSTOPPED(status)) {   //If SIGCHLD is triggered by a SIGTSTP
             printf("Job [%d] (%d) stopped by signal %d\n", job->jid, job->pid, WSTOPSIG(status));
             job->state = ST;
         }
-        if (WIFSIGNALED(status)) {
+        if (WIFSIGNALED(status)) {  //If SIGCHLD is triggered by a SIGINT
             printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, WTERMSIG(status));
             clearjob(job);
         }
@@ -379,7 +367,7 @@ void sigchld_handler(int sig) {
 void sigint_handler(int sig) 
 {
   pid_t pid;
-  if((pid = fgpid(jobs)) != 0){     //if there is a fg process running.
+  if((pid = fgpid(jobs)) != 0){     //If there is a fg process running.
       kill(-pid, sig);
   }
 }
@@ -392,7 +380,7 @@ void sigint_handler(int sig)
 void sigtstp_handler(int sig) 
 {
     pid_t pid;
-    if((pid = fgpid(jobs)) != 0){     //if there is a fg process running.
+    if((pid = fgpid(jobs)) != 0){   //If there is a fg process running.
         kill(-pid, sig);
     }
 }

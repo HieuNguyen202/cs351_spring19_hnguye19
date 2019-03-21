@@ -71,7 +71,7 @@ int main(int argc, char** argv)
         parse(line, ret);
         printf("%s %s %s\n", ret[0], ret[1], ret[2]);
     }
-
+    //TODO: Make a queue data structure to implement the cache
     //TODO: Run csim-ref with different flags to observe its behaviors
     printSummary(0, 0, 0);
     return 0;

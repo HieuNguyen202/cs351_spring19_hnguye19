@@ -16,8 +16,9 @@ char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n
                      "Examples:\n"
                      "  linux>  ./csim-ref -s 4 -E 1 -b 4 -t traces/yi.trace\n"
                      "  linux>  ./csim-ref -v -s 8 -E 2 -b 4 -t traces/yi.trace";
-
 void print_help();  //Print help message
+void parse(char* buf, char** ret);
+
 
 int main(int argc, char** argv)
 {
@@ -58,12 +59,31 @@ int main(int argc, char** argv)
         }
     }
 
-    //TODO: add command parser
     //TODO: Run csim-ref with different flags to observe its behaviors
     printSummary(0, 0, 0);
     return 0;
 }
 
+/// Parse a line. The ret contains null terminated pieces of info of the line:
+/// \param buf the input line
+/// \param ret the result
+/// ret[0] pointer to the operation char
+/// ret[1] pointer to the address
+/// ret[2] pointer to the size
+void parse(char* buf, char** ret){
+    while(*buf == ' ') buf++;   //Skip leading white spaces
+    ret[0] = buf;               //Set the pointer of the operation char
+    *(++buf) = '\0';            //Set the next char to '\0'
+    while(*buf == ' ') buf++;   //Skip white spaces
+    ret[1] = buf;               //Set the pointer for the address
+    while(*buf != ',') buf++;   //Skip until a comma
+    *buf = '\0';                //Change the comma to '\0'
+    ret[2] = ++buf;             //Set the pointer for size
+    while(*buf != '\n') buf++;  //Skip until a new line char
+    *buf = '\0';                //Change the new line char to '\0'
+}
+
+///Print a help message
 void print_help(){
     printf("%s", help_message);
 }

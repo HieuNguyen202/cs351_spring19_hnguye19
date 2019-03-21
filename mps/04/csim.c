@@ -55,8 +55,6 @@ int main(int argc, char** argv)
                 break;
             case 't':
                 trace_file = optarg;
-//                trace_file = "traces/yi.trace";
-                //TODO: this is not ended with a NULL char, needs fix
                 break;
             default:    //'?'
                 //TODO: devide what to do by default

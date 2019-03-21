@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include <unistd.h>
 #include <stdlib.h>
+#define MAX_LINE_LENGTH 16
 
 char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n"
                      "Options:\n"
@@ -28,6 +29,10 @@ int main(int argc, char** argv)
     int f_verbose, num_lines_per_set, num_set_index_bits, num_block_bits;
     char* trace_file;
     int c;
+    char* line;
+    char* ret[3];
+    FILE* fp;
+    size_t len = MAX_LINE_LENGTH;
     while ((c=getopt(argc, argv, optString))!=-1){
         switch(c){
             case 'h':
@@ -50,6 +55,8 @@ int main(int argc, char** argv)
                 break;
             case 't':
                 trace_file = optarg;
+//                trace_file = "traces/yi.trace";
+                //TODO: this is not ended with a NULL char, needs fix
                 break;
             default:    //'?'
                 //TODO: devide what to do by default
@@ -57,6 +64,14 @@ int main(int argc, char** argv)
                 print_help();
                 exit(0);
         }
+    }
+    if((fp = fopen(trace_file, "r")) == NULL){
+        printf("Failed to open file %s\n", "traces/yi.trace");
+        exit(1);
+    }
+    while(getline(&line, &len, fp) != -1){
+        parse(line, ret);
+        printf("%s %s %s\n", ret[0], ret[1], ret[2]);
     }
 
     //TODO: Run csim-ref with different flags to observe its behaviors
@@ -73,7 +88,9 @@ int main(int argc, char** argv)
 void parse(char* buf, char** ret){
     while(*buf == ' ') buf++;   //Skip leading white spaces
     ret[0] = buf;               //Set the pointer of the operation char
-    *(++buf) = '\0';            //Set the next char to '\0'
+    buf++;                      //Next char
+    *buf = '\0';                //Set current char to '\0' (it should have been a space char before)
+    buf++;                      //Next char
     while(*buf == ' ') buf++;   //Skip white spaces
     ret[1] = buf;               //Set the pointer for the address
     while(*buf != ',') buf++;   //Skip until a comma

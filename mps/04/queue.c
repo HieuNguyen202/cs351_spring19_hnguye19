@@ -40,7 +40,18 @@ void enqueue(queuep_t q, int val){
 /// \param q the queue
 /// \return the value of the removed queue
 int dequeue(queuep_t q){
-    return 0;
+    int ret;
+    nodep_t n;
+    if(q->front == NULL){   //queue is empty
+        printf("Queue is empty, it returns -1, but it should raise an exception here!\n");
+        return -1;
+    }
+    n = q->front;
+    ret = n->val;
+    q->front = q->front->next;      //The next in queue gets to the front
+    free(n);                        //Free memory
+    q->count--;
+    return ret;
 }
 
 /// Check if a given value exists in the queue
@@ -68,15 +79,32 @@ queuep_t queue_create(){
 ///Print all values of the queue. Delimited by a space.
 void queue_print(queuep_t q){
     nodep_t n = q->front;
+    printf(" Queue: ");
     while(n != NULL){
         printf("%d ", n->val);
         n = n->next;
     }
-    printf("\n");
+    printf(" count: %d\n", q->count);
 }
 
 int main(int argc, char** argv) {
     queuep_t q = queue_create();
+    enqueue(q, 1);
+    queue_print(q);
     enqueue(q, 2);
     queue_print(q);
+    enqueue(q, 3);
+    queue_print(q);
+    enqueue(q, 4);
+    queue_print(q);
+    dequeue(q);
+    queue_print(q);
+    dequeue(q);
+    queue_print(q);
+    dequeue(q);
+    queue_print(q);
+    dequeue(q);
+    dequeue(q);
+    queue_print(q);
+
 }

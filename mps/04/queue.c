@@ -15,7 +15,7 @@ struct node{
 };
 
 struct queue{
-    nodep_t font;
+    nodep_t front;
     nodep_t back;
     int count;
 };
@@ -24,28 +24,37 @@ struct queue{
 /// \param q the queue
 /// \param val new value to be added
 void enqueue(queuep_t q, int val){
-
+    nodep_t n = malloc(sizeof(node_t));
+    n->val = val;
+    n->next = NULL;
+    if(q->back == NULL){
+        q->front = q->back = n;
+    } else {
+        q->back->next = n;
+        q->back = n;
+    }
+    (q->count)++;
 }
 
 /// Remove a node from the front of the queue
 /// \param q the queue
 /// \return the value of the removed queue
 int dequeue(queuep_t q){
-
+    return 0;
 }
 
 /// Check if a given value exists in the queue
 /// \param q the queue
 /// \return 0 id doesn't exist, 1 of does exit
-int queue_contains(queuep_t q, val){
-
+int queue_contains(queuep_t q, int val){
+    return 0;
 }
 
 /// Initialize a queue
 /// \param q pointer to the queue to be initialized
 void queue_init(queuep_t q){
     q->count = 0;
-    q->back = q->back = NULL;
+    q->front = q->back = NULL;
 }
 
 /// Allocate memory for a queue
@@ -53,12 +62,12 @@ void queue_init(queuep_t q){
 queuep_t queue_create(){
     queuep_t q = malloc(sizeof(queue_t));
     queue_init(q);
-    return &q;
+    return q;
 }
 
 ///Print all values of the queue. Delimited by a space.
 void queue_print(queuep_t q){
-    nodep_t n = q->font;
+    nodep_t n = q->front;
     while(n != NULL){
         printf("%d ", n->val);
         n = n->next;
@@ -68,4 +77,6 @@ void queue_print(queuep_t q){
 
 int main(int argc, char** argv) {
     queuep_t q = queue_create();
+    enqueue(q, 2);
+    queue_print(q);
 }

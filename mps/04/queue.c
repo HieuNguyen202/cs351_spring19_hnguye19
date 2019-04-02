@@ -2,6 +2,7 @@
 // Created by HIEU NGUYEN on 2019-04-02.
 //
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef struct node* nodep_t;
 typedef struct node node_t;
@@ -55,6 +56,16 @@ queuep_t queue_create(){
     return &q;
 }
 
-int main(int argc, char** argv) {
+///Print all values of the queue. Delimited by a space.
+void queue_print(queuep_t q){
+    nodep_t n = q->font;
+    while(n != NULL){
+        printf("%d ", n->val);
+        n = n->next;
+    }
+    printf("\n");
+}
 
+int main(int argc, char** argv) {
+    queuep_t q = queue_create();
 }

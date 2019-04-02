@@ -20,7 +20,6 @@ char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n
 void print_help();  //Print help message
 void parse(char* buf, char** ret);
 
-
 int main(int argc, char** argv)
 {
     char *optString = "hvs:E:b:t:";

@@ -47,6 +47,14 @@ void queue_init(queuep_t q){
     q->back = q->back = NULL;
 }
 
+/// Allocate memory for a queue
+/// \return pointer to the queue
+queuep_t queue_create(){
+    queuep_t q = malloc(sizeof(queue_t));
+    queue_init(q);
+    return &q;
+}
+
 int main(int argc, char** argv) {
 
 }

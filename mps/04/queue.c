@@ -1,6 +1,7 @@
 //
 // Created by HIEU NGUYEN on 2019-04-02.
 //
+#include <stdlib.h>
 
 typedef struct node* nodep_t;
 typedef struct node node_t;
@@ -37,6 +38,13 @@ int dequeue(queuep_t q){
 /// \return 0 id doesn't exist, 1 of does exit
 int queue_contains(queuep_t q, val){
 
+}
+
+/// Initialize a queue
+/// \param q pointer to the queue to be initialized
+void queue_init(queuep_t q){
+    q->count = 0;
+    q->back = q->back = NULL;
 }
 
 int main(int argc, char** argv) {

@@ -12,5 +12,5 @@ add_executable(tsh ${SOURCE_FILES_3})
 set(SOURCE_FILES_4 mps/04/csim.c mps/04/cachelab.c mps/04/queue.c)
 add_executable(csim ${SOURCE_FILES_4})
 
-set(SOURCE_FILES_4_1 mps/04/queue.c)
-add_executable(queue ${SOURCE_FILES_4_1})
+set(SOURCE_FILES_4_1 mps/04/queue_test.c)
+add_executable(queue_test ${SOURCE_FILES_4_1})

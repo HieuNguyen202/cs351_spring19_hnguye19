@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include "queue.c"
 #define MAX_LINE_LENGTH 16
+#define ADDR_SIZE 9
+
 
 char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n"
                      "Options:\n"
@@ -23,6 +25,7 @@ void parse(char* buf, char** ret);
 
 int main(int argc, char** argv)
 {
+    int hits = 0, misses = 0, evicts = 0;
     char *optString = "hvs:E:b:t:";
     extern char* optarg;
     extern int optind, opterr, optopt;
@@ -68,16 +71,30 @@ int main(int argc, char** argv)
         exit(1);
     }
     queuep_t q = queue_create();
-
+    int qsize = 5;
+    char* addr;
+    //TODO: read the cache chapter to understand how cache is organized before going back to coding
     while(getline(&line, &len, fp) != -1){
         parse(line, ret);
-        enqueue(q, (int)ret[1]);
+        if(*ret[0] == 'I')           //ignore instruction fetch
+            continue;
+        addr = malloc(ADDR_SIZE);
+        strcpy(addr, ret[1]);
+        while(!queue_contains(q, addr)){
+            misses++;
+            while (q->count >= qsize){
+                dequeue(q);
+                evicts++;
+            }
+            enqueue(q, addr);
+        }
+        hits++;
         queue_print(q);
 //        printf("%s %s %s\n", ret[0], ret[1], ret[2]);
     }
     //TODO: Make a queue data structure to implement the cache
     //TODO: Run csim-ref with different flags to observe its behaviors
-    printSummary(0, 0, 0);
+    printSummary(hits, misses, evicts);
     return 0;
 }
 

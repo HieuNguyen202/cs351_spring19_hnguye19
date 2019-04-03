@@ -50,6 +50,7 @@ void* dequeue(queuep_t q){
     n = q->front;
     ret = n->val;
     q->front = q->front->next;      //The next in queue gets to the front
+    free(n->val);
     free(n);                        //Free memory
     q->count--;
     return ret;

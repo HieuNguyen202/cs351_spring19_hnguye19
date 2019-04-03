@@ -56,8 +56,15 @@ int dequeue(queuep_t q){
 
 /// Check if a given value exists in the queue
 /// \param q the queue
-/// \return 0 id doesn't exist, 1 of does exit
+/// \return 1 if queue contains val, o otherwise
 int queue_contains(queuep_t q, int val){
+    nodep_t n = q->front;
+    while(n != NULL){
+        if(n->val == val){
+            return 1;
+        }
+        n = n->next;
+    }
     return 0;
 }
 

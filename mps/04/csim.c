@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include "queue.c"
 #define MAX_LINE_LENGTH 16
 
 char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n"
@@ -66,9 +67,13 @@ int main(int argc, char** argv)
         printf("Failed to open file %s\n", "traces/yi.trace");
         exit(1);
     }
+    queuep_t q = queue_create();
+
     while(getline(&line, &len, fp) != -1){
         parse(line, ret);
-        printf("%s %s %s\n", ret[0], ret[1], ret[2]);
+        enqueue(q, (int)ret[1]);
+        queue_print(q);
+//        printf("%s %s %s\n", ret[0], ret[1], ret[2]);
     }
     //TODO: Make a queue data structure to implement the cache
     //TODO: Run csim-ref with different flags to observe its behaviors

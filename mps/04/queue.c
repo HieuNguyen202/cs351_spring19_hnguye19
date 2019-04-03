@@ -3,6 +3,8 @@
 //
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
 
 typedef struct node* nodep_t;
 typedef struct node node_t;
@@ -10,7 +12,7 @@ typedef struct queue queue_t;
 typedef struct queue* queuep_t;
 
 struct node{
-    int val;
+    void* val;
     struct node* next;
 };
 
@@ -23,7 +25,7 @@ struct queue{
 /// Add a node to the back of the queue
 /// \param q the queue
 /// \param val new value to be added
-void enqueue(queuep_t q, int val){
+void enqueue(queuep_t q, void* val){
     nodep_t n = malloc(sizeof(node_t));
     n->val = val;
     n->next = NULL;
@@ -39,12 +41,11 @@ void enqueue(queuep_t q, int val){
 /// Remove a node from the front of the queue
 /// \param q the queue
 /// \return the value of the removed queue
-int dequeue(queuep_t q){
-    int ret;
+void* dequeue(queuep_t q){
+    void* ret;
     nodep_t n;
     if(q->front == NULL){   //queue is empty
-        printf("Queue is empty, it returns -1, but it should raise an exception here!\n");
-        return -1;
+        return NULL;
     }
     n = q->front;
     ret = n->val;
@@ -56,11 +57,11 @@ int dequeue(queuep_t q){
 
 /// Check if a given value exists in the queue
 /// \param q the queue
-/// \return 1 if queue contains val, o otherwise
-int queue_contains(queuep_t q, int val){
+/// \return 1 if queue contains val, 0 otherwise
+int queue_contains(queuep_t q, void* val){
     nodep_t n = q->front;
     while(n != NULL){
-        if(n->val == val){
+        if(strcmp(n->val, (char*)val) == 0){   //identical strings
             return 1;
         }
         n = n->next;
@@ -88,7 +89,7 @@ void queue_print(queuep_t q){
     nodep_t n = q->front;
     printf(" Queue: ");
     while(n != NULL){
-        printf("%d ", n->val);
+        printf("%s ", n->val);
         n = n->next;
     }
     printf(" count: %d\n", q->count);

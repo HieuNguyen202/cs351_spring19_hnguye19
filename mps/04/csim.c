@@ -7,7 +7,6 @@
 #define MAX_LINE_LENGTH 16
 #define ADDR_SIZE 9
 
-
 char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n"
                      "Options:\n"
                      "  -h         Print this help message.\n"
@@ -22,9 +21,11 @@ char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n
                      "  linux>  ./csim-ref -v -s 8 -E 2 -b 4 -t traces/yi.trace";
 void print_help();  //Print help message
 void parse(char* buf, char** ret);
+unsigned int hex2bin(char* hex);
 
 int main(int argc, char** argv)
 {
+    hex2bin("AB");
     int hits = 0, misses = 0, evicts = 0;
     char *optString = "hvs:E:b:t:";
     extern char* optarg;
@@ -89,13 +90,53 @@ int main(int argc, char** argv)
             enqueue(q, addr);
         }
         hits++;
-        queue_print(q);
+//        queue_print(q);
 //        printf("%s %s %s\n", ret[0], ret[1], ret[2]);
     }
     //TODO: Make a queue data structure to implement the cache
     //TODO: Run csim-ref with different flags to observe its behaviors
     printSummary(hits, misses, evicts);
     return 0;
+}
+
+/// Extract bits from from to to in addr
+/// \param addr the address whose bits will be extracted from.
+/// \param from from bit index (bit index start from 0 for the least sig. bit (the right most bit)
+/// \param to to bit index (inclusive)
+/// \return the value of the extracted bits
+unsigned int extract(unsigned int addr, int from, int to){
+    int l, r;    //left, right
+    l = (sizeof(unsigned int) * 8) - 1 - from;
+    r = to + l;
+    return (addr << l) >> r;
+}
+
+/// Convert ASCII encoded HEX to binary
+/// \param hex ASCII encoded HEX
+/// \return equivalent binary
+unsigned int hex2bin(char* hex){
+    hex = "aBCD";
+    unsigned int d, ret = 0;
+    int len = strlen(hex);
+    char c;
+    for (int i = len -1; i > -1; --i) {
+        c = hex[i];
+        //Convert the char from ASCII to binary
+        if(c>= '0' && c<= '9'){
+            d = c - '0';
+        } else if(c >= 'A' && c <= 'F'){
+            d = c - 'A' + 10;
+        } else if(c>= 'a' && c<= 'f') {
+            d = c - 'a' + 10;
+        } else {
+            printf("hex2bin: invalid hex is given '%c' in '%s'\n", c, hex);
+        }
+        //Shift the bits to the right position
+        d = d << ((len - 1 - i)*4);
+        //OR with the accumulator
+        ret |= d;
+    }
+    return ret;
 }
 
 /// Parse a line. The ret contains null terminated pieces of info of the line:

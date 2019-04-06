@@ -25,7 +25,6 @@ unsigned int hex2bin(char* hex);
 
 int main(int argc, char** argv)
 {
-    hex2bin("AB");
     int hits = 0, misses = 0, evicts = 0;
     char *optString = "hvs:E:b:t:";
     extern char* optarg;
@@ -115,7 +114,6 @@ unsigned int extract(unsigned int addr, int from, int to){
 /// \param hex ASCII encoded HEX
 /// \return equivalent binary
 unsigned int hex2bin(char* hex){
-    hex = "aBCD";
     unsigned int d, ret = 0;
     int len = strlen(hex);
     char c;

@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     int f_verbose, E, s, b;
     char* trace_file;
     int c;
-    char* line;
+    char* line = NULL;
     char* ret[3];
     FILE* fp;
     while ((c=getopt(argc, argv, optString))!=-1){

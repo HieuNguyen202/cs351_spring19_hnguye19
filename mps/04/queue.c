@@ -20,6 +20,13 @@ typedef struct cache_set* cache_setp_t;
 typedef struct cache cache_t;
 typedef struct cache* cachep_t;
 
+typedef struct result res_t;
+typedef struct result* resp_t;
+
+struct result{
+    int hits, misses, evicts;
+};
+
 struct node{
     void* val;
     struct node* next;
@@ -42,7 +49,7 @@ struct cache_set{
 };
 
 struct cache{
-    size_t s, E, b;
+    int s, E, b;
     cache_setp_t sets;
 };
 
@@ -74,9 +81,13 @@ void* dequeue(queuep_t q){
     n = q->front;
     ret = n->val;
     q->front = q->front->next;      //The next in queue gets to the front
+    if(q->front == NULL) {          //in case the queue has 1 element before dequeue
+        q->back = NULL;
+    }
     free(n->val);
     free(n);                        //Free memory
     q->count--;
+
     return ret;
 }
 
@@ -137,7 +148,7 @@ void print_cache_set(cache_setp_t s){
 
 void print_cache(cachep_t c){
     int S = 1 << (c->s);
-    printf("Cache:\n");
+    printf("Cache (s = %d, E = %d, b = %d):\n", c->s, c->E, c->b);
     for (int i = 0; i < S; ++i) {
         printf("\tSet %d:\n\t", i);
         print_cache_set(&c->sets[i]);
@@ -161,6 +172,55 @@ cachep_t make_cache(size_t s, size_t E, size_t b){
     return c;
 }
 
-void cache_access(int addr, int* hits, int* misses, int* evicts){
-    printf("Addr %X\n", addr);
+/// Extract bits from from to to in addr
+/// \param addr the address whose bits will be extracted from.
+/// \param from from bit index (bit index start from 0 for the least sig. bit (the right most bit)
+/// \param to to bit index (inclusive)
+/// \return the value of the extracted bits
+unsigned int extract(unsigned int addr, int from, int to){
+    int l, r;    //left, right
+    l = (sizeof(unsigned int) * 8) - 1 - from;
+    r = to + l;
+    return (addr << l) >> r;
+}
+
+void cache_access(cachep_t c, unsigned int addr, resp_t res){
+    int sidx, bidx, tag;
+    bidx = extract(addr, c->b - 1, 0);
+    sidx = extract(addr, c->b + c->s -1, c->b);
+    tag = extract(addr, 31, c->b + c->s);
+    nodep_t n = c->sets[sidx].lines->front;
+    cache_linep_t l, il = NULL;     //cache line, invalid cache line
+    while(n != NULL){
+        l = (cache_linep_t)n->val;
+        if(l->valid){
+            if(l->tag == tag){      //hits
+                (res->hits)++;
+                return;
+            }
+        } else{                     //Not applied to the implementation of this simulation because the line never becomes invalid. However, if it ever does, this code still work.
+            il = l;
+        }
+        n = n->next;
+    }
+    //Reaching here means the value is not cached (it's a miss), need to load from lower level memories.
+    (res->misses)++;
+    if(il != NULL){                 //If a line somehow becomes invalid, simply replace the line with new data
+        il->valid = 1;
+        il->tag = tag;
+        //Should load the blocks to cache (but not applied to this simulation).
+        return;
+    } else{                         //If there is no invalid lines
+        while(c->sets[sidx].lines->count >= c->E){       //While the number of caches line >= the allowed number of cache line
+            //evict a line
+            dequeue(c->sets[sidx].lines);
+            (res->evicts)++;
+        }
+        cache_linep_t nl = malloc(sizeof(cache_line_t));
+        nl->valid = 1;
+        nl->tag = tag;
+        //Should load the blocks to cache (but not applied to this simulation).
+        enqueue(c->sets[sidx].lines, (void*)nl);
+    }
+    printf("Addr %X tag: %X, sidx: %X, bidx: %X\n", addr, tag, sidx, bidx);
 }

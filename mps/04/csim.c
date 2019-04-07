@@ -26,13 +26,11 @@ unsigned int extract(unsigned int addr, int from, int to);
 
 int main(int argc, char** argv)
 {
-    cachep_t cache = make_cache(2, 3, 2);      //s, E, b
-    print_cache(cache);
-    int hits = 0, misses = 0, evicts = 0;
+    res_t res = {0, 0, 0};
     char *optString = "hvs:E:b:t:";
     extern char* optarg;
     extern int optind, opterr, optopt;
-    int f_verbose, num_lines_per_set, num_set_index_bits, num_block_bits;
+    int f_verbose, E, s, b;
     char* trace_file;
     int c;
     char* line;
@@ -49,15 +47,15 @@ int main(int argc, char** argv)
                 break;
             case 's':
                 //TODO: make sure the input contains valid numeric
-                num_lines_per_set = atoi(optarg);
+                s = atoi(optarg);
                 break;
             case 'E':
                 //TODO: make sure the input contains valid numeric
-                num_lines_per_set = atoi(optarg);
+                E = atoi(optarg);
                 break;
             case 'b':
                 //TODO: make sure the input contains valid numeric
-                num_block_bits = atoi(optarg);
+                b = atoi(optarg);
                 break;
             case 't':
                 trace_file = optarg;
@@ -73,47 +71,21 @@ int main(int argc, char** argv)
         printf("Failed to open file %s\n", "traces/yi.trace");
         exit(1);
     }
-    queuep_t q = queue_create();
-    int qsize = 5;
-    char* addr;
-    //TODO: read the cache chapter to understand how cache is organized before going back to coding
+    cachep_t cache = make_cache(s, E, b);      //s, E, b
+    print_cache(cache);
     while(getline(&line, &len, fp) != -1){
+        //ret[0]: access type; ret[1]: address; ret[2]: size
         parse(line, ret);
         if(*ret[0] == 'I')           //ignore instruction fetch
             continue;
-        addr = malloc(ADDR_SIZE);
-        strcpy(addr, ret[1]);
-        printf("ascii addr %s\n", addr);
-        printf("binary addr %x\n", hex2bin(addr));
+        cache_access(cache, hex2bin(ret[1]), &res);
 
-        while(!queue_contains(q, addr)){
-            misses++;
-            while (q->count >= qsize){
-                dequeue(q);
-                evicts++;
-            }
-            enqueue(q, addr);
-        }
-        hits++;
-//        queue_print(q);
 //        printf("%s %s %s\n", ret[0], ret[1], ret[2]);
     }
     //TODO: Make a queue data structure to implement the cache
     //TODO: Run csim-ref with different flags to observe its behaviors
-    printSummary(hits, misses, evicts);
+    printSummary(res.hits, res.misses, res.evicts);
     return 0;
-}
-
-/// Extract bits from from to to in addr
-/// \param addr the address whose bits will be extracted from.
-/// \param from from bit index (bit index start from 0 for the least sig. bit (the right most bit)
-/// \param to to bit index (inclusive)
-/// \return the value of the extracted bits
-unsigned int extract(unsigned int addr, int from, int to){
-    int l, r;    //left, right
-    l = (sizeof(unsigned int) * 8) - 1 - from;
-    r = to + l;
-    return (addr << l) >> r;
 }
 
 /// Convert ASCII encoded HEX to binary

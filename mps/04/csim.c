@@ -204,7 +204,7 @@ unsigned int extract(unsigned int addr, int from, int to){
     return (addr << l) >> r;
 }
 
-void cache_access(cachep_t c, unsigned int addr, resp_t res){
+void cache_access(cachep_t c, unsigned int addr, resp_t res, int f_verbose){
     int sidx, tag;
 //    bidx = extract(addr, c->b - 1, 0);
     sidx = extract(addr, c->b + c->s -1, c->b);
@@ -216,6 +216,9 @@ void cache_access(cachep_t c, unsigned int addr, resp_t res){
         if(l->valid){
             if(l->tag == tag){      //hits
                 (res->hits)++;
+                if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+                    printf(" hit\n");
+                }
                 return;
             }
         } else{                     //Not applied to the implementation of this simulation because the line never becomes invalid. However, if it ever does, this code still work.
@@ -225,22 +228,36 @@ void cache_access(cachep_t c, unsigned int addr, resp_t res){
     }
     //Reaching here means the value is not cached (it's a miss), need to load from lower level memories.
     (res->misses)++;
-    if(il != NULL){                 //If a line somehow becomes invalid, simply replace the line with new data
+    if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+        printf(" miss");
+    }
+    if(il != NULL){//If a line somehow becomes invalid, simply replace the line with new data
         il->valid = 1;
         il->tag = tag;
         //Should load the blocks to cache (but not applied to this simulation).
+        if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+            printf("\n");
+        }
         return;
-    } else{                         //If there is no invalid lines
+    } else {                         //If there is no invalid lines
         while(c->sets[sidx].lines->count >= c->E){       //While the number of caches line >= the allowed number of cache line
+            print_cache(c);
             //evict a line
             dequeue(c->sets[sidx].lines);
             (res->evicts)++;
+            if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+                printf(" evictions");
+            }
         }
+        //add a new line
         cache_linep_t nl = malloc(sizeof(cache_line_t));
         nl->valid = 1;
         nl->tag = tag;
         //Should load the blocks to cache (but not applied to this simulation).
         enqueue(c->sets[sidx].lines, (void*)nl);
+        if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+            printf("\n");
+        }
     }
 //    printf("Addr %X tag: %X, sidx: %X, bidx: %X\n", addr, tag, sidx, bidx);
 }
@@ -300,6 +317,8 @@ void print_help(){
 
 int main(int argc, char** argv)
 {
+    printf("size of int %d\n", (int)sizeof(int));
+    printf("size of long %d\n", (int)sizeof(long));
     res_t res = {0, 0, 0};
     char *optString = "hvs:E:b:t:";
     extern char* optarg;
@@ -340,9 +359,6 @@ int main(int argc, char** argv)
                 exit(0);
         }
     }
-    if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
-        //do nothing
-    }
     if((fp = fopen(trace_file, "r")) == NULL){
         printf("Failed to open file %s\n", "traces/yi.trace");
         exit(1);
@@ -354,9 +370,13 @@ int main(int argc, char** argv)
         parse(line, ret);
         if(*ret[0] == 'I')           //ignore instruction fetch
             continue;
-        cache_access(cache, hex2bin(ret[1]), &res);
+
+        if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+            printf("%s %s,%s", ret[0], ret[1], ret[2]);
+        }
+        cache_access(cache, hex2bin(ret[1]), &res, f_verbose);
         if(*ret[0] == 'M')           //Modify operation access cache twice
-            cache_access(cache, hex2bin(ret[1]), &res);
+            cache_access(cache, hex2bin(ret[1]), &res, f_verbose);
 //        printf("%s %s %s\n", ret[0], ret[1], ret[2]);
     }
 //    print_cache(cache);

@@ -140,7 +140,7 @@ void print_cache_set(cache_setp_t s){
     printf("\tE = %d\n", (int)(s->E));
     nodep_t n = s->lines->front;
     while(n != NULL){
-        printf("\tLine: ");
+        printf("\t\tLine: ");
         print_cache_line((cache_linep_t)n->val);
         n = n->next;
     }
@@ -222,5 +222,5 @@ void cache_access(cachep_t c, unsigned int addr, resp_t res){
         //Should load the blocks to cache (but not applied to this simulation).
         enqueue(c->sets[sidx].lines, (void*)nl);
     }
-    printf("Addr %X tag: %X, sidx: %X, bidx: %X\n", addr, tag, sidx, bidx);
+//    printf("Addr %X tag: %X, sidx: %X, bidx: %X\n", addr, tag, sidx, bidx);
 }

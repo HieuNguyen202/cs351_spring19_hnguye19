@@ -72,17 +72,17 @@ int main(int argc, char** argv)
         exit(1);
     }
     cachep_t cache = make_cache(s, E, b);      //s, E, b
-    print_cache(cache);
     while(getline(&line, &len, fp) != -1){
         //ret[0]: access type; ret[1]: address; ret[2]: size
         parse(line, ret);
         if(*ret[0] == 'I')           //ignore instruction fetch
             continue;
         cache_access(cache, hex2bin(ret[1]), &res);
-
+        if(*ret[0] == 'M')           //Modify operation access cache twice
+            cache_access(cache, hex2bin(ret[1]), &res);
 //        printf("%s %s %s\n", ret[0], ret[1], ret[2]);
     }
-    //TODO: Make a queue data structure to implement the cache
+//    print_cache(cache);
     //TODO: Run csim-ref with different flags to observe its behaviors
     printSummary(res.hits, res.misses, res.evicts);
     return 0;

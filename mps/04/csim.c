@@ -36,7 +36,6 @@ int main(int argc, char** argv)
     char* line;
     char* ret[3];
     FILE* fp;
-    size_t len = MAX_LINE_LENGTH;
     while ((c=getopt(argc, argv, optString))!=-1){
         switch(c){
             case 'h':
@@ -76,7 +75,7 @@ int main(int argc, char** argv)
     }
     cachep_t cache = make_cache(s, E, b);      //s, E, b
 //    while(getline(&line, &len, fp) != -1){
-    while(fgets(&line, &len, fp) != NULL){
+    while(fgets(line, MAX_LINE_LENGTH, fp) != NULL){
         //ret[0]: access type; ret[1]: address; ret[2]: size
         parse(line, ret);
         if(*ret[0] == 'I')           //ignore instruction fetch

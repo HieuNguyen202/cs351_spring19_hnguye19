@@ -7,7 +7,6 @@
 #include <time.h>
 
 #define MAX_LINE_LENGTH 16
-//#define ADDR_SIZE 9
 
 char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n"
                      "Options:\n"
@@ -208,6 +207,11 @@ unsigned int extract(unsigned long addr, int from, int to){
     return (addr << l) >> r;
 }
 
+/// Cache simulation.
+/// \param c the cache
+/// \param addr address to be accessed
+/// \param res result
+/// \param f_verbose verbose mode
 void cache_access(cachep_t c, unsigned long addr, resp_t res, int f_verbose){
     int sidx, tag;
 //    bidx = extract(addr, c->b - 1, 0);

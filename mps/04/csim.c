@@ -3,7 +3,6 @@
 #include <getopt.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "queue.c"
 #include <string.h>
 
 #define MAX_LINE_LENGTH 16
@@ -246,6 +245,59 @@ void cache_access(cachep_t c, unsigned int addr, resp_t res){
 //    printf("Addr %X tag: %X, sidx: %X, bidx: %X\n", addr, tag, sidx, bidx);
 }
 
+/// Convert ASCII encoded HEX to binary
+/// \param hex ASCII encoded HEX
+/// \return equivalent binary
+unsigned int hex2bin(char* hex){
+    unsigned int d, ret = 0;
+    int len = strlen(hex);
+    char c;
+    for (int i = len -1; i > -1; --i) {
+        c = hex[i];
+        //Convert the char from ASCII to binary
+        if(c>= '0' && c<= '9'){
+            d = c - '0';
+        } else if(c >= 'A' && c <= 'F'){
+            d = c - 'A' + 10;
+        } else if(c>= 'a' && c<= 'f') {
+            d = c - 'a' + 10;
+        } else {
+            printf("hex2bin: invalid hex is given '%c' in '%s'\n", c, hex);
+        }
+        //Shift the bits to the right position
+        d = d << ((len - 1 - i)*4);
+        //OR with the accumulator
+        ret |= d;
+    }
+    return ret;
+}
+
+/// Parse a line. The ret contains null terminated pieces of info of the line:
+/// \param buf the input line
+/// \param ret the result
+/// ret[0] pointer to the operation char
+/// ret[1] pointer to the address
+/// ret[2] pointer to the size
+void parse(char* buf, char** ret){
+    while(*buf == ' ') buf++;   //Skip leading white spaces
+    ret[0] = buf;               //Set the pointer of the operation char
+    buf++;                      //Next char
+    *buf = '\0';                //Set current char to '\0' (it should have been a space char before)
+    buf++;                      //Next char
+    while(*buf == ' ') buf++;   //Skip white spaces
+    ret[1] = buf;               //Set the pointer for the address
+    while(*buf != ',') buf++;   //Skip until a comma
+    *buf = '\0';                //Change the comma to '\0'
+    ret[2] = ++buf;             //Set the pointer for size
+    while(*buf != '\n') buf++;  //Skip until a new line char
+    *buf = '\0';                //Change the new line char to '\0'
+}
+
+///Print a help message
+void print_help(){
+    printf("%s", help_message);
+}
+
 int main(int argc, char** argv)
 {
     res_t res = {0, 0, 0};
@@ -255,7 +307,7 @@ int main(int argc, char** argv)
     int f_verbose, E, s, b;
     char* trace_file;
     int c;
-    char* line = NULL;
+    char line[MAX_LINE_LENGTH];
     char* ret[3];
     FILE* fp;
     while ((c=getopt(argc, argv, optString))!=-1){
@@ -311,57 +363,4 @@ int main(int argc, char** argv)
     //TODO: Run csim-ref with different flags to observe its behaviors
     printSummary(res.hits, res.misses, res.evicts);
     return 0;
-}
-
-/// Convert ASCII encoded HEX to binary
-/// \param hex ASCII encoded HEX
-/// \return equivalent binary
-unsigned int hex2bin(char* hex){
-    unsigned int d, ret = 0;
-    int len = strlen(hex);
-    char c;
-    for (int i = len -1; i > -1; --i) {
-        c = hex[i];
-        //Convert the char from ASCII to binary
-        if(c>= '0' && c<= '9'){
-            d = c - '0';
-        } else if(c >= 'A' && c <= 'F'){
-            d = c - 'A' + 10;
-        } else if(c>= 'a' && c<= 'f') {
-            d = c - 'a' + 10;
-        } else {
-            printf("hex2bin: invalid hex is given '%c' in '%s'\n", c, hex);
-        }
-        //Shift the bits to the right position
-        d = d << ((len - 1 - i)*4);
-        //OR with the accumulator
-        ret |= d;
-    }
-    return ret;
-}
-
-/// Parse a line. The ret contains null terminated pieces of info of the line:
-/// \param buf the input line
-/// \param ret the result
-/// ret[0] pointer to the operation char
-/// ret[1] pointer to the address
-/// ret[2] pointer to the size
-void parse(char* buf, char** ret){
-    while(*buf == ' ') buf++;   //Skip leading white spaces
-    ret[0] = buf;               //Set the pointer of the operation char
-    buf++;                      //Next char
-    *buf = '\0';                //Set current char to '\0' (it should have been a space char before)
-    buf++;                      //Next char
-    while(*buf == ' ') buf++;   //Skip white spaces
-    ret[1] = buf;               //Set the pointer for the address
-    while(*buf != ',') buf++;   //Skip until a comma
-    *buf = '\0';                //Change the comma to '\0'
-    ret[2] = ++buf;             //Set the pointer for size
-    while(*buf != '\n') buf++;  //Skip until a new line char
-    *buf = '\0';                //Change the new line char to '\0'
-}
-
-///Print a help message
-void print_help(){
-    printf("%s", help_message);
 }

@@ -318,15 +318,11 @@ void print_help(){
 
 int main(int argc, char** argv)
 {
-    clock_t cl = clock();
-    printf("Time: %lu\n", cl);
-    printf("size of int %d\n", (int)sizeof(int));
-    printf("size of long %d\n", (int)sizeof(long));
     res_t res = {0, 0, 0};
     char *optString = "hvs:E:b:t:";
     extern char* optarg;
     extern int optind, opterr, optopt;
-    int f_verbose, E, s, b;
+    int f_verbose = 0, E, s, b;
     char* trace_file;
     int c;
     char line[MAX_LINE_LENGTH];
@@ -367,23 +363,18 @@ int main(int argc, char** argv)
         exit(1);
     }
     cachep_t cache = make_cache(s, E, b);      //s, E, b
-//    while(getline(&line, &len, fp) != -1){
     while(fgets(line, MAX_LINE_LENGTH, fp) != NULL){
         //ret[0]: access type; ret[1]: address; ret[2]: size
         parse(line, ret);
         if(*ret[0] == 'I')           //ignore instruction fetch
             continue;
-
-        if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+        if(f_verbose){
             printf("%s %s,%s", ret[0], ret[1], ret[2]);
         }
         cache_access(cache, hex2bin(ret[1]), &res, f_verbose);
         if(*ret[0] == 'M')           //Modify operation access cache twice
             cache_access(cache, hex2bin(ret[1]), &res, f_verbose);
-//        printf("%s %s %s\n", ret[0], ret[1], ret[2]);
     }
-//    print_cache(cache);
-    //TODO: Run csim-ref with different flags to observe its behaviors
     printSummary(res.hits, res.misses, res.evicts);
     return 0;
 }

@@ -125,7 +125,7 @@ void queue_print(queuep_t q){
     nodep_t n = q->front;
     printf(" Queue: ");
     while(n != NULL){
-        printf("%s ", n->val);
+        printf("%s ", (char*)(n->val));
         n = n->next;
     }
     printf(" count: %d\n", q->count);
@@ -185,8 +185,8 @@ unsigned int extract(unsigned int addr, int from, int to){
 }
 
 void cache_access(cachep_t c, unsigned int addr, resp_t res){
-    int sidx, bidx, tag;
-    bidx = extract(addr, c->b - 1, 0);
+    int sidx, tag;
+//    bidx = extract(addr, c->b - 1, 0);
     sidx = extract(addr, c->b + c->s -1, c->b);
     tag = extract(addr, 31, c->b + c->s);
     nodep_t n = c->sets[sidx].lines->front;

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "queue.c"
 #define MAX_LINE_LENGTH 16
-#define ADDR_SIZE 9
+//#define ADDR_SIZE 9
 
 char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n"
                      "Options:\n"
@@ -67,12 +67,16 @@ int main(int argc, char** argv)
                 exit(0);
         }
     }
+    if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+        //do nothing
+    }
     if((fp = fopen(trace_file, "r")) == NULL){
         printf("Failed to open file %s\n", "traces/yi.trace");
         exit(1);
     }
     cachep_t cache = make_cache(s, E, b);      //s, E, b
-    while(getline(&line, &len, fp) != -1){
+//    while(getline(&line, &len, fp) != -1){
+    while(fgets(&line, &len, fp) != NULL){
         //ret[0]: access type; ret[1]: address; ret[2]: size
         parse(line, ret);
         if(*ret[0] == 'I')           //ignore instruction fetch

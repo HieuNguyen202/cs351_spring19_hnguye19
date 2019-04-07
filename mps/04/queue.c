@@ -11,6 +11,15 @@ typedef struct node node_t;
 typedef struct queue queue_t;
 typedef struct queue* queuep_t;
 
+typedef struct cache_line cache_line_t;
+typedef struct cache_line* cache_linep_t;
+
+typedef struct cache_set cache_set_t;
+typedef struct cache_set* cache_setp_t;
+
+typedef struct cache cache_t;
+typedef struct cache* cachep_t;
+
 struct node{
     void* val;
     struct node* next;
@@ -20,6 +29,21 @@ struct queue{
     nodep_t front;
     nodep_t back;
     int count;
+};
+
+struct cache_line{
+    int valid, tag;
+//    void* blocks;   //Pointer to the block array, but not needed for this simulation
+};
+
+struct cache_set{
+    size_t E;
+    queuep_t lines;
+};
+
+struct cache{
+    size_t s, E, b;
+    cache_setp_t sets;
 };
 
 /// Add a node to the back of the queue
@@ -85,7 +109,7 @@ queuep_t queue_create(){
     return q;
 }
 
-///Print all values of the queue. Delimited by a space.
+///Print all values of the queue. Only used to test the queue. Each node is simply a string. Delimited by a space.
 void queue_print(queuep_t q){
     nodep_t n = q->front;
     printf(" Queue: ");
@@ -94,4 +118,49 @@ void queue_print(queuep_t q){
         n = n->next;
     }
     printf(" count: %d\n", q->count);
+}
+
+void print_cache_line(cache_linep_t l){
+    printf("%d %X\n", l->valid, l->tag);
+}
+
+///Print all values of the queue. Only used to test the queue. Each node is simply a string. Delimited by a space.
+void print_cache_set(cache_setp_t s){
+    printf("\tE = %d\n", (int)(s->E));
+    nodep_t n = s->lines->front;
+    while(n != NULL){
+        printf("\tLine: ");
+        print_cache_line((cache_linep_t)n->val);
+        n = n->next;
+    }
+}
+
+void print_cache(cachep_t c){
+    int S = 1 << (c->s);
+    printf("Cache:\n");
+    for (int i = 0; i < S; ++i) {
+        printf("\tSet %d:\n\t", i);
+        print_cache_set(&c->sets[i]);
+    }
+}
+
+cachep_t make_cache(size_t s, size_t E, size_t b){
+    cachep_t c = malloc(sizeof(cache_t));
+    //Init sets
+    int S = (1<<s);
+    cache_setp_t sets = malloc(S * sizeof(cache_set_t));       //array of sets
+    for (int i = 0; i < S; ++i) {
+        sets[i].E = E;
+        sets[i].lines = queue_create();
+    }
+    //Commit the values
+    c->b = b;
+    c->E = E;
+    c->s = s;
+    c->sets = sets;
+    return c;
+}
+
+void cache_access(int addr, int* hits, int* misses, int* evicts){
+    printf("Addr %X\n", addr);
 }

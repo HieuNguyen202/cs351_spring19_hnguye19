@@ -22,9 +22,12 @@ char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n
 void print_help();  //Print help message
 void parse(char* buf, char** ret);
 unsigned int hex2bin(char* hex);
+unsigned int extract(unsigned int addr, int from, int to);
 
 int main(int argc, char** argv)
 {
+    cachep_t cache = make_cache(2, 3, 2);      //s, E, b
+    print_cache(cache);
     int hits = 0, misses = 0, evicts = 0;
     char *optString = "hvs:E:b:t:";
     extern char* optarg;
@@ -80,6 +83,9 @@ int main(int argc, char** argv)
             continue;
         addr = malloc(ADDR_SIZE);
         strcpy(addr, ret[1]);
+        printf("ascii addr %s\n", addr);
+        printf("binary addr %x\n", hex2bin(addr));
+
         while(!queue_contains(q, addr)){
             misses++;
             while (q->count >= qsize){

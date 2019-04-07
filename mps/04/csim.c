@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_LINE_LENGTH 16
 //#define ADDR_SIZE 9
@@ -23,7 +24,7 @@ char* help_message = "Usage: ./csim [-hv] -s <num> -E <num> -b <num> -t <file>\n
 void print_help();  //Print help message
 void parse(char* buf, char** ret);
 unsigned int hex2bin(char* hex);
-unsigned int extract(unsigned int addr, int from, int to);
+unsigned int extract(unsigned long addr, int from, int to);
 
 
 typedef struct node* nodep_t;
@@ -59,13 +60,15 @@ struct queue{
 };
 
 struct cache_line{
-    int valid, tag;
+    int valid;
+    unsigned long tag;
+    clock_t time;    //last accessed time
 //    void* blocks;   //Pointer to the block array, but not needed for this simulation
 };
 
 struct cache_set{
     size_t E;
-    queuep_t lines;
+    cache_linep_t lines;
 };
 
 struct cache{
@@ -152,17 +155,15 @@ void queue_print(queuep_t q){
 }
 
 void print_cache_line(cache_linep_t l){
-    printf("%d %X\n", l->valid, l->tag);
+    printf("Valid tag time: %d %lx %lu\n", l->valid, l->tag, l->time);
 }
 
 ///Print all values of the queue. Only used to test the queue. Each node is simply a string. Delimited by a space.
 void print_cache_set(cache_setp_t s){
     printf("\tE = %d\n", (int)(s->E));
-    nodep_t n = s->lines->front;
-    while(n != NULL){
+    for (int i = 0; i < s->E; ++i) {
         printf("\t\tLine: ");
-        print_cache_line((cache_linep_t)n->val);
-        n = n->next;
+        print_cache_line(&(s->lines[i]));
     }
 }
 
@@ -182,7 +183,10 @@ cachep_t make_cache(size_t s, size_t E, size_t b){
     cache_setp_t sets = malloc(S * sizeof(cache_set_t));       //array of sets
     for (int i = 0; i < S; ++i) {
         sets[i].E = E;
-        sets[i].lines = queue_create();
+        sets[i].lines = malloc(E * sizeof(cache_line_t));      //array of lines
+        for (int j = 0; j < E; ++j) {
+            sets[i].lines[j].valid = 0;
+        }
     }
     //Commit the values
     c->b = b;
@@ -197,69 +201,66 @@ cachep_t make_cache(size_t s, size_t E, size_t b){
 /// \param from from bit index (bit index start from 0 for the least sig. bit (the right most bit)
 /// \param to to bit index (inclusive)
 /// \return the value of the extracted bits
-unsigned int extract(unsigned int addr, int from, int to){
+unsigned int extract(unsigned long addr, int from, int to){
     int l, r;    //left, right
-    l = (sizeof(unsigned int) * 8) - 1 - from;
+    l = (sizeof(addr) * 8) - 1 - from;
     r = to + l;
     return (addr << l) >> r;
 }
 
-void cache_access(cachep_t c, unsigned int addr, resp_t res, int f_verbose){
+void cache_access(cachep_t c, unsigned long addr, resp_t res, int f_verbose){
     int sidx, tag;
 //    bidx = extract(addr, c->b - 1, 0);
     sidx = extract(addr, c->b + c->s -1, c->b);
-    tag = extract(addr, 31, c->b + c->s);
-    nodep_t n = c->sets[sidx].lines->front;
-    cache_linep_t l, il = NULL;     //cache line, invalid cache line
-    while(n != NULL){
-        l = (cache_linep_t)n->val;
-        if(l->valid){
-            if(l->tag == tag){      //hits
-                (res->hits)++;
+    if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+        printf(" set %d", sidx);
+    }
+    tag = extract(addr, (sizeof(unsigned long) * 8) - 1, c->b + c->s);
+    cache_setp_t set = &(c->sets[sidx]);
+    cache_linep_t il = NULL;    //Invalid line
+    for (int i = 0; i < set->E; ++i) {
+        cache_linep_t l = &(set->lines[i]);
+        if (l->valid) {
+            if (l->tag == tag) {
+                (res->hits)++;      //hit
+                l->time = clock();
                 if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
                     printf(" hit\n");
                 }
                 return;
             }
-        } else{                     //Not applied to the implementation of this simulation because the line never becomes invalid. However, if it ever does, this code still work.
+        } else {
             il = l;
         }
-        n = n->next;
     }
-    //Reaching here means the value is not cached (it's a miss), need to load from lower level memories.
-    (res->misses)++;
-    if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+    (res->misses)++;                //miss
+    if(f_verbose){
         printf(" miss");
     }
-    if(il != NULL){//If a line somehow becomes invalid, simply replace the line with new data
+    if(il != NULL) {                //Still have empty (invalid) lines
         il->valid = 1;
         il->tag = tag;
-        //Should load the blocks to cache (but not applied to this simulation).
+        il->time = clock();
         if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
             printf("\n");
         }
         return;
-    } else {                         //If there is no invalid lines
-        while(c->sets[sidx].lines->count >= c->E){       //While the number of caches line >= the allowed number of cache line
-            print_cache(c);
-            //evict a line
-            dequeue(c->sets[sidx].lines);
-            (res->evicts)++;
-            if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
-                printf(" evictions");
-            }
-        }
-        //add a new line
-        cache_linep_t nl = malloc(sizeof(cache_line_t));
-        nl->valid = 1;
-        nl->tag = tag;
-        //Should load the blocks to cache (but not applied to this simulation).
-        enqueue(c->sets[sidx].lines, (void*)nl);
-        if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
-            printf("\n");
+    }
+                                    //eviction
+    cache_linep_t ll = set->lines;  //Least recently accessed line, first line by default
+    for (int i = 0; i < set->E; ++i) {
+        cache_linep_t l = &(set->lines[i]);
+        if(l->time < ll->time) {
+            ll = l;
         }
     }
-//    printf("Addr %X tag: %X, sidx: %X, bidx: %X\n", addr, tag, sidx, bidx);
+    if(f_verbose){  //trying to trick the compiler that i'm suing f_verbose
+        printf(" eviction\n");
+    }
+    ll->valid = 1;                  //Maybe redundant because it's always valid when reach here.
+    ll->tag = tag;
+    ll->time = clock();
+    (res->evicts)++;
 }
 
 /// Convert ASCII encoded HEX to binary
@@ -317,6 +318,8 @@ void print_help(){
 
 int main(int argc, char** argv)
 {
+    clock_t cl = clock();
+    printf("Time: %lu\n", cl);
     printf("size of int %d\n", (int)sizeof(int));
     printf("size of long %d\n", (int)sizeof(long));
     res_t res = {0, 0, 0};

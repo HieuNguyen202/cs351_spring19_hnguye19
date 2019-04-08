@@ -72,112 +72,112 @@ void trans1(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 1;
     int block_size_row = 1;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans2_desc[] = "Blocking transpose 2";
 void trans2(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 2;
     int block_size_row = 2;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans3_desc[] = "Blocking transpose 3";
 void trans3(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 3;
     int block_size_row = 3;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans4_desc[] = "Blocking transpose 4";
 void trans4(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 4;
     int block_size_row = 4;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans5_desc[] = "Blocking transpose 5";
 void trans5(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 5;
     int block_size_row = 5;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans6_desc[] = "Blocking transpose 6";
 void trans6(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 6;
     int block_size_row = 6;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans7_desc[] = "Blocking transpose 7";
 void trans7(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 7;
     int block_size_row = 7;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans8_desc[] = "Blocking transpose 8";
 void trans8(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 8;
     int block_size_row = 8;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans9_desc[] = "Blocking transpose 9";
 void trans9(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 9;
     int block_size_row = 9;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans10_desc[] = "Blocking transpose 10";
 void trans10(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 10;
     int block_size_row = 10;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans11_desc[] = "Blocking transpose 11";
 void trans11(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 11;
     int block_size_row = 11;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans12_desc[] = "Blocking transpose 12";
 void trans12(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 12;
     int block_size_row = 12;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans13_desc[] = "Blocking transpose 13";
 void trans13(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 13;
     int block_size_row = 13;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans14_desc[] = "Blocking transpose 14";
 void trans14(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 14;
     int block_size_row = 14;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans15_desc[] = "Blocking transpose 15";
 void trans15(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 15;
     int block_size_row = 15;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 char trans16_desc[] = "Blocking transpose 16";
 void trans16(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 16;
     int block_size_row = 16;
-    mytrans(M, N, A[N][M], B[M][N], block_size_row, block_size_int);
+    mytrans(M, N, A, B, block_size_row, block_size_int);
 }
 
 

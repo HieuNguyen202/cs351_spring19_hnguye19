@@ -50,19 +50,22 @@ void mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int blo
     int i, j, k, l;
     for (j = M - block_size_int; j > -1; j -= block_size_int) {
         for (i =0; i < N; i += block_size_row) {
-            if (i == j) {
-                for (k = 0; k < block_size_row; ++k) {
-                    for (l = block_size_int - 1; l > -1; --l) {
-                        B[j + l][i + k] = A[i + k][j + l];
-                    }
-                }
-            } else {
-                for (k = 0; k < block_size_row; ++k) {
-                    for (l = 0; l < block_size_int; ++l) {
-                        B[j + l][i + k] = A[i + k][j + l];
-                    }
+//            if (i == j) {
+            int lastk = i + block_size_row;
+            for (k = i; k < lastk; ++k) {
+                int lastj = j + block_size_int;
+                for (l = j ; l < lastj; ++l) {
+                    B[l][k] = A[k][l];
                 }
             }
+//            } else {
+//                for (k = 0; k < block_size_row; ++k) {
+//                    int lastl = j+ block_size_int;
+//                    for (l = 0; l < lastl; ++l) {
+//                        B[l][k] = A[k][l];
+//                    }
+//                }
+//            }
         }
     }
 }

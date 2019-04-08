@@ -49,20 +49,20 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 void mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int){
     int i, j, k, l;
     for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j += block_size_int) {
-//            if (i == j) {
-//                for (k = 0; k < block_size_row; ++k) {
-//                    for (l = block_size_int - 1; l > -1; --l) {
-//                        B[j + l][i + k] = A[i + k][j + l];
-//                    }
-//                }
-//            } else {
+        for (j = M - block_size_int - 1; j > -1; j -= block_size_int) {
+            if (i == j) {
+                for (k = 0; k < block_size_row; ++k) {
+                    for (l = block_size_int - 1; l > -1; --l) {
+                        B[j + l][i + k] = A[i + k][j + l];
+                    }
+                }
+            } else {
                 for (k = 0; k < block_size_row; ++k) {
                     for (l = 0; l < block_size_int; ++l) {
                         B[j + l][i + k] = A[i + k][j + l];
                     }
                 }
-//            }
+            }
         }
     }
 }

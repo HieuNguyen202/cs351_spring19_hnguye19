@@ -46,8 +46,142 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 
 }
 
-char trans1_desc[] = "Blocking transpose 32";
+char trans1_desc[] = "Blocking transpose 1";
 void trans1(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 1;
+    int block_size_row = 1;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+
+char trans2_desc[] = "Blocking transpose 2";
+void trans2(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 2;
+    int block_size_row = 2;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans3_desc[] = "Blocking transpose 3";
+void trans3(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 3;
+    int block_size_row = 3;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans4_desc[] = "Blocking transpose 4";
+void trans4(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 4;
+    int block_size_row = 4;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans5_desc[] = "Blocking transpose 5";
+void trans6(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 5;
+    int block_size_row = 5;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans6_desc[] = "Blocking transpose 6";
+void trans6(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 6;
+    int block_size_row = 6;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans7_desc[] = "Blocking transpose 7";
+void trans7(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 7;
+    int block_size_row = 7;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans8_desc[] = "Blocking transpose 8";
+void trans8(int M, int N, int A[N][M], int B[M][N])
 {
     int i, j, k, l;
 //    int cB = 32;
@@ -65,15 +199,147 @@ void trans1(int M, int N, int A[N][M], int B[M][N])
         }
     }
 }
-
-char trans2_desc[] = "Blocking transpose 64";
-void trans2(int M, int N, int A[N][M], int B[M][N])
+char trans9_desc[] = "Blocking transpose 9";
+void trans9(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 9;
+    int block_size_row = 9;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans10_desc[] = "Blocking transpose 10";
+void trans10(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 10;
+    int block_size_row = 10;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans11_desc[] = "Blocking transpose 11";
+void trans11(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 11;
+    int block_size_row = 11;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans12_desc[] = "Blocking transpose 12";
+void trans12(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 12;
+    int block_size_row = 12;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans13_desc[] = "Blocking transpose 13";
+void trans13(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 13;
+    int block_size_row = 13;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans14_desc[] = "Blocking transpose 14";
+void trans14(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 14;
+    int block_size_row = 14;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans15_desc[] = "Blocking transpose 15";
+void trans15(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+//    int cB = 32;
+//    int cS = 8;
+    int block_size_int = 15;
+    int block_size_row = 15;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+char trans16_desc[] = "Blocking transpose 16";
+void trans16(int M, int N, int A[N][M], int B[M][N])
 {
     int i, j, k, l;
 //    int cB = 32;
 //    int cS = 8;
     int block_size_int = 16;
-    int block_size_row = 2;
+    int block_size_row = 16;
     for (i = 0; i < N; i+=block_size_row) {
         for (j = 0; j < M; j+=block_size_int) {
             for (k = 0; k < block_size_row; ++k) {
@@ -103,6 +369,20 @@ void registerFunctions()
     registerTransFunction(trans, trans_desc); 
     registerTransFunction(trans1, trans1_desc);
     registerTransFunction(trans2, trans2_desc);
+    registerTransFunction(trans3, trans3_desc);
+    registerTransFunction(trans4, trans4_desc);
+    registerTransFunction(trans5, trans5_desc);
+    registerTransFunction(trans6, trans6_desc);
+    registerTransFunction(trans7, trans7_desc);
+    registerTransFunction(trans8, trans8_desc);
+    registerTransFunction(trans9, trans9_desc);
+    registerTransFunction(trans10, trans10_desc);
+    registerTransFunction(trans11, trans11_desc);
+    registerTransFunction(trans12, trans12_desc);
+    registerTransFunction(trans13, trans13_desc);
+    registerTransFunction(trans14, trans14_desc);
+    registerTransFunction(trans15, trans15_desc);
+    registerTransFunction(trans16, trans16_desc);
 }
 
 /* 

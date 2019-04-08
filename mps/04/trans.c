@@ -46,7 +46,7 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 
 }
 
-voi mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int){
+void mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int){
     int i, j, k, l;
     for (i = 0; i < N; i+=block_size_row) {
         for (j = 0; j < M; j += block_size_int) {

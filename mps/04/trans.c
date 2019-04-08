@@ -49,15 +49,15 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 char trans1_desc[] = "Blocking transpose";
 void trans1(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, tmp;
+    int i, j, k, l;
     int cB = 32;
-    int cS = 8;
+//    int cS = 8;
     int block_size_int = cB / sizeof(int);
     int block_size_row = block_size_int;
-    for (int i = 0; i < N; i+=block_size_row) {
-        for (int j = 0; j < M; j+=block_size_int) {
-            for (int k = 0; k < block_size_row; ++k) {
-                for (int l = 0; l < block_size_int; ++l) {
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
                     B[j+l][i+k] = A[i+k][j+l];
                 }
             }

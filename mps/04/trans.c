@@ -124,7 +124,7 @@ void trans4(int M, int N, int A[N][M], int B[M][N])
     }
 }
 char trans5_desc[] = "Blocking transpose 5";
-void trans6(int M, int N, int A[N][M], int B[M][N])
+void trans5(int M, int N, int A[N][M], int B[M][N])
 {
     int i, j, k, l;
 //    int cB = 32;

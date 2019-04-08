@@ -46,310 +46,139 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 
 }
 
-char trans1_desc[] = "Blocking transpose 1";
-void trans1(int M, int N, int A[N][M], int B[M][N])
-{
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
-    int block_size_int = 1;
-    int block_size_row = 1;
+voi mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int){
     for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
+        for (j = 0; j < M; j += block_size_int) {
+            if (i == j) {
+                for (k = 0; k < block_size_row; ++k) {
+                    for (l = block_size_int - 1; l > -1; --l) {
+                        B[j + l][i + k] = A[i + k][j + l];
+                    }
+                }
+            } else {
+                for (k = 0; k < block_size_row; ++k) {
+                    for (l = 0; l < block_size_int; ++l) {
+                        B[j + l][i + k] = A[i + k][j + l];
+                    }
                 }
             }
-//            printf("%d %d\n", i, j);
         }
     }
 }
 
+
+char trans1_desc[] = "Blocking transpose 1";
+void trans1(int M, int N, int A[N][M], int B[M][N])
+{
+    int block_size_int = 1;
+    int block_size_row = 1;
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
+}
 char trans2_desc[] = "Blocking transpose 2";
 void trans2(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 2;
     int block_size_row = 2;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans3_desc[] = "Blocking transpose 3";
 void trans3(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 3;
     int block_size_row = 3;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
+
 }
 char trans4_desc[] = "Blocking transpose 4";
 void trans4(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 4;
     int block_size_row = 4;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans5_desc[] = "Blocking transpose 5";
 void trans5(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 5;
     int block_size_row = 5;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans6_desc[] = "Blocking transpose 6";
 void trans6(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 6;
     int block_size_row = 6;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans7_desc[] = "Blocking transpose 7";
 void trans7(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 7;
     int block_size_row = 7;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans8_desc[] = "Blocking transpose 8";
 void trans8(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 8;
     int block_size_row = 8;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans9_desc[] = "Blocking transpose 9";
 void trans9(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 9;
     int block_size_row = 9;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans10_desc[] = "Blocking transpose 10";
 void trans10(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 10;
     int block_size_row = 10;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans11_desc[] = "Blocking transpose 11";
 void trans11(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 11;
     int block_size_row = 11;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans12_desc[] = "Blocking transpose 12";
 void trans12(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 12;
     int block_size_row = 12;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans13_desc[] = "Blocking transpose 13";
 void trans13(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 13;
     int block_size_row = 13;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans14_desc[] = "Blocking transpose 14";
 void trans14(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 14;
     int block_size_row = 14;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans15_desc[] = "Blocking transpose 15";
 void trans15(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 15;
     int block_size_row = 15;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 char trans16_desc[] = "Blocking transpose 16";
 void trans16(int M, int N, int A[N][M], int B[M][N])
 {
-    int i, j, k, l;
-//    int cB = 32;
-//    int cS = 8;
     int block_size_int = 16;
     int block_size_row = 16;
-    for (i = 0; i < N; i+=block_size_row) {
-        for (j = 0; j < M; j+=block_size_int) {
-            for (k = 0; k < block_size_row; ++k) {
-                for (l = 0; l < block_size_int; ++l) {
-                    B[j+l][i+k] = A[i+k][j+l];
-                }
-            }
-//            printf("%d %d\n", i, j);
-        }
-    }
+    mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int)
 }
 
 

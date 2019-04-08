@@ -66,6 +66,29 @@ void trans1(int M, int N, int A[N][M], int B[M][N])
     }
 }
 
+char trans2_desc[] = "No diagonal transpose";
+void trans2(int M, int N, int A[N][M], int B[M][N])
+{
+    int i, j, k, l;
+    int cB = 32;
+//    int cS = 8;
+    int block_size_int = cB / sizeof(int);
+    int block_size_row = block_size_int;
+    for (i = 0; i < N; i+=block_size_row) {
+        for (j = 0; j < M; j+=block_size_int) {
+            if(i = j)
+                continue;
+            for (k = 0; k < block_size_row; ++k) {
+                for (l = 0; l < block_size_int; ++l) {
+                    B[j+l][i+k] = A[i+k][j+l];
+                }
+            }
+//            printf("%d %d\n", i, j);
+        }
+    }
+}
+
+
 /*
  * registerFunctions - This function registers your transpose
  *     functions with the driver.  At runtime, the driver will
@@ -81,6 +104,7 @@ void registerFunctions()
     /* Register any additional transpose functions */
     registerTransFunction(trans, trans_desc); 
     registerTransFunction(trans1, trans1_desc);
+    registerTransFunction(trans2, trans2_desc);
 }
 
 /* 

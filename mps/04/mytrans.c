@@ -61,26 +61,28 @@ void trans1(int M, int N, int A[N][M], int B[M][N]) {
     int dy = 8;
     for (j = 0; j<M; j+=dy) {
         for (i = 0; i<N; i+=dx) {
-            if (i == j) {
+//            if (i == j) {
                 for (jj = 0; jj < dy; ++jj) {
                     for (ii = 0; ii < dx; ++ii) {
                         B[jj+j][i + ((jj + ii + 1)%dx)] = A[i + ((jj + ii + 1)%dx)][jj+j] ;
+                        printf("[%d %d] ", i + ((jj + ii + 1)%dx), jj+j);
                     }
+                    printf("\n");
                 }
-            } else {
-                for (jj = 0; jj < dy; ++jj) {
-                    for (ii = 0; ii < dx; ++ii) {
-                        B[jj+j][ii+i] = A[ii+i][jj+j] ;
-                    }
-                }
-            }
+//            } else {
+//                for (jj = 0; jj < dy; ++jj) {
+//                    for (ii = 0; ii < dx; ++ii) {
+//                        B[jj+j][ii+i] = A[ii+i][jj+j] ;
+//                    }
+//                }
+//            }
         }
     }
 }
 
 int main(int argc, char** argv) {
-    int M = 32;
-    int N = 32;
+    int M = 8;
+    int N = 8;
     int A[N][M];
     int B[N][M];
     int cidx = 0;
@@ -88,8 +90,9 @@ int main(int argc, char** argv) {
     int cache_size = 32;
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < M; ++j) {
-            A[i][j] = (cidx/block_size)%32;
-            cidx++;
+            A[i][j] = i*2+j;
+//            A[i][j] = (cidx/block_size)%32;
+//            cidx++;
         }
     }
     trans1(M, N, A, B);

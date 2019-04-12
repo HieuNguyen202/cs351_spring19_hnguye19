@@ -46,26 +46,23 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 
 }
 
-void mytrans(int M, int N, int A[N][M], int B[M][N], int block_size_row, int block_size_int){
-    int i, j, k, l;
-    for (j = M - block_size_int; j > -1; j -= block_size_int) {
-        for (i =0; i < N; i += block_size_row) {
-//            if (i == j) {
-            int lastk = i + block_size_row;
-            for (k = i; k < lastk; ++k) {
-                int lastj = j + block_size_int;
-                for (l = j ; l < lastj; ++l) {
-                    B[l][k] = A[k][l];
+void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx){
+    int i, j, ii, jj;
+    for (j = 0; j<M; j+=dy) {
+        for (i = 0; i<N; i+=dx) {
+            if (i == j) {
+                for (jj = 0; jj < dy; ++jj) {
+                    for (ii = 0; ii < dx; ++ii) {
+                        B[jj+j][i + ((jj + ii + 1)%dx)] = A[i + ((jj + ii + 1)%dx)][jj+j] ;
+                    }
+                }
+            } else {
+                for (jj = 0; jj < dy; ++jj) {
+                    for (ii = 0; ii < dx; ++ii) {
+                        B[jj+j][ii+i] = A[ii+i][jj+j] ;
+                    }
                 }
             }
-//            } else {
-//                for (k = 0; k < block_size_row; ++k) {
-//                    int lastl = j+ block_size_int;
-//                    for (l = 0; l < lastl; ++l) {
-//                        B[l][k] = A[k][l];
-//                    }
-//                }
-//            }
         }
     }
 }

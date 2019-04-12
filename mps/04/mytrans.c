@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < M; ++j) {
             A[i][j] = (cidx/block_size)%32;
-            cidx = (cidx + 2);
+            cidx++;
         }
     }
     trans1(M, N, A, B);

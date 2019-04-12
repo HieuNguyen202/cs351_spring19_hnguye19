@@ -51,18 +51,18 @@ void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
     for (j = 0; j < M; j += dy) {
         for (i = 0; i < N; i += dx) {
 //            if (i == j) {
-                for (jj = 0; jj < dy; ++jj) {
-                    for (ii = 0; ii < dx; ++ii) {
-                        h = i + ((jj + ii + 1) % dx);
-                        B[h][jj + j] = A[jj + j][h];
-                    }
-                }
-//            } else {
 //                for (jj = 0; jj < dy; ++jj) {
 //                    for (ii = 0; ii < dx; ++ii) {
-//                        B[ii + i][jj + j] = A[jj + j][ii + i];
+//                        h = i + ((jj + ii + 1) % dx);
+//                        B[h][jj + j] = A[jj + j][h];
 //                    }
 //                }
+//            } else {
+                for (jj = 0; jj < dy; ++jj) {
+                    for (ii = 0; ii < dx; ++ii) {
+                        B[ii + i][jj + j] = A[jj + j][ii + i];
+                    }
+                }
 //            }
         }
     }

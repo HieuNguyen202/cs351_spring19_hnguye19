@@ -53,7 +53,7 @@ void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx){
 //            if (i == j) {
                 for (jj = 0; jj < dy; ++jj) {
                     for (ii = 0; ii < dx; ++ii) {
-                        h = i + ((jj + ii + 1)%dx)
+                        h = i + ((jj + ii + 1)%dx);
                         B[jj+j][h] = A[h][jj+j] ;
                     }
                 }

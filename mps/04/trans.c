@@ -235,23 +235,23 @@ void registerFunctions()
     registerTransFunction(transpose_submit, transpose_submit_desc); 
 
     /* Register any additional transpose functions */
-//    registerTransFunction(trans, trans_desc);
+    registerTransFunction(trans, trans_desc);
 //    registerTransFunction(trans1, trans1_desc);
-    registerTransFunction(trans2, trans2_desc);
+//    registerTransFunction(trans2, trans2_desc);
 //    registerTransFunction(trans3, trans3_desc);
-    registerTransFunction(trans4, trans4_desc);
+//    registerTransFunction(trans4, trans4_desc);
 //    registerTransFunction(trans5, trans5_desc);
-    registerTransFunction(trans6, trans6_desc);
+//    registerTransFunction(trans6, trans6_desc);
 //    registerTransFunction(trans7, trans7_desc);
     registerTransFunction(trans8, trans8_desc);
-    registerTransFunction(trans9, trans9_desc);
-    registerTransFunction(trans10, trans10_desc);
+//    registerTransFunction(trans9, trans9_desc);
+//    registerTransFunction(trans10, trans10_desc);
 //    registerTransFunction(trans11, trans11_desc);
-    registerTransFunction(trans12, trans12_desc);
+//    registerTransFunction(trans12, trans12_desc);
 //    registerTransFunction(trans13, trans13_desc);
-    registerTransFunction(trans14, trans14_desc);
+//    registerTransFunction(trans14, trans14_desc);
 //    registerTransFunction(trans15, trans15_desc);
-    registerTransFunction(trans16, trans16_desc);
+//    registerTransFunction(trans16, trans16_desc);
 }
 
 /* 

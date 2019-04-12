@@ -47,23 +47,21 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 }
 
 void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
-    int i, j, ii, jj;
-    for (j = 0; j < M; j += dy) {
-        for (i = 0; i < N; i += dx) {
-//            if (i == j) {
-//                for (jj = 0; jj < dy; ++jj) {
-//                    for (ii = 0; ii < dx; ++ii) {
-//                        h = i + ((jj + ii + 1) % dx);
-//                        B[h][jj + j] = A[jj + j][h];
-//                    }
-//                }
-//            } else {
-                for (jj = 0; jj < dy; ++jj) {
-                    for (ii = 0; ii < dx; ++ii) {
-                        B[ii + i][jj + j] = A[jj + j][ii + i];
-                    }
+    int x, y, xx, yy, i;
+    for (y = 0; y < M; y += dy) {
+        for (x = 0; x < N; x += dx) {
+            //Blocking of size dyXdx
+            //Assuming the block is size 4x4, the order that elements from matrix A should be loaded is as follow:
+            //[3  0  1  2]
+            //[6  7  4  5]
+            //[9  10 11 8]
+            //[12 12 14 15]
+            for (yy = 0; yy < dy; ++yy) {
+                for (i = 0; i < dx; ++i) {
+                    xx = (i + yy + 1) % dx;
+                    B[x+ xx][yy + y] = A[y + yy][x + xx];
                 }
-//            }
+            }
         }
     }
 }

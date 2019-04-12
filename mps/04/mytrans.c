@@ -56,33 +56,30 @@ int print_matrix(int M, int N, int A[N][M], int B[M][N])
 }
 
 void trans1(int M, int N, int A[N][M], int B[M][N]) {
-    int i, j, ii, jj;
     int dx = 8;
     int dy = 8;
-    for (j = 0; j<M; j+=dy) {
-        for (i = 0; i<N; i+=dx) {
-//            if (i == j) {
-                for (jj = 0; jj < dy; ++jj) {
-                    for (ii = 0; ii < dx; ++ii) {
-                        B[jj+j][i + ((jj + ii + 1)%dx)] = A[i + ((jj + ii + 1)%dx)][jj+j] ;
-                        printf("[%d %d] ", i + ((jj + ii + 1)%dx), jj+j);
-                    }
-                    printf("\n");
+    int x, y, xx, yy, i;
+    for (y = 0; y < M; y += dy) {
+        for (x = 0; x < N; x += dx) {
+            //Blocking of size dyXdx
+            //Assuming the block is size 4x4, the order that elements from matrix A should be loaded is as follow:
+            //[3  0  1  2]
+            //[6  7  4  5]
+            //[9  10 11 8]
+            //[12 12 14 15]
+            for (yy = 0; yy < dy; ++yy) {
+                for (i = 0; i < dx; ++i) {
+                    xx = (i + yy + 1) % dx;
+                    B[x+ xx][yy + y] = A[y + yy][x + xx];
                 }
-//            } else {
-//                for (jj = 0; jj < dy; ++jj) {
-//                    for (ii = 0; ii < dx; ++ii) {
-//                        B[jj+j][ii+i] = A[ii+i][jj+j] ;
-//                    }
-//                }
-//            }
+            }
         }
     }
 }
 
 int main(int argc, char** argv) {
-    int M = 8;
-    int N = 8;
+    int M = 32;
+    int N = 32;
     int A[N][M];
     int B[N][M];
     int cidx = 0;

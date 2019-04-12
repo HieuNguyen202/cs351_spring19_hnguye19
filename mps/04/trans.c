@@ -47,7 +47,7 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 }
 
 void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
-    int i, j, ii, jj, h;
+    int i, j, ii, jj;
     for (j = 0; j < M; j += dy) {
         for (i = 0; i < N; i += dx) {
 //            if (i == j) {

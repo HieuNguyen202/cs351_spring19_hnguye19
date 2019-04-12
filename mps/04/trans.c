@@ -47,13 +47,14 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 }
 
 void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx){
-    int i, j, ii, jj;
+    int i, j, ii, jj, h;
     for (j = 0; j<M; j+=dy) {
         for (i = 0; i<N; i+=dx) {
 //            if (i == j) {
                 for (jj = 0; jj < dy; ++jj) {
                     for (ii = 0; ii < dx; ++ii) {
-                        B[jj+j][i + ((jj + ii + 1)%dx)] = A[i + ((jj + ii + 1)%dx)][jj+j] ;
+                        h = i + ((jj + ii + 1)%dx)
+                        B[jj+j][h] = A[h][jj+j] ;
                     }
                 }
 //            } else {

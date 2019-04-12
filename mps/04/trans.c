@@ -47,6 +47,47 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 }
 
 void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
+    int x, xx, xxx, y, yy, yyy, i, ii, dx, ddx, dy, ddy;
+    ddx = dx / 2;
+    ddy = dy / 2;
+
+    for (y = 0; y < M; y += dy) {
+        for (x = 0; x < N; x += dx) {
+            //Blocking level 1:
+            //Let 0, 1, 2, 3 represents elements of the same block.
+            //The given matrix can be divided into 8x8 (dy x dx) blocks, one of which is as follow:
+            //[0 0 0 0 1 1 1 1]
+            //[0 0 0 0 1 1 1 1]
+            //[0 0 0 0 1 1 1 1]
+            //[0 0 0 0 1 1 1 1]
+            //[3 3 3 3 2 2 2 2]
+            //[3 3 3 3 2 2 2 2]
+            //[3 3 3 3 2 2 2 2]
+            //[3 3 3 3 2 2 2 2]
+            //In blocking level 1, matrix A, we will load 4x4 (ddy x ddx)sub-blocks in this order: 0, 1, 2, 3
+            //Each 4x4 sub-block is processed in the next two inner for loops.
+            for (yy = 0; yy < dy; yy += ddy) {
+                for (i = 0; i < dx; i += ddx) {
+                    xx = yy == 1 ? ddx - i : i;
+                    //Blocking level 2
+                    //Each 4x4 sub-block of matrix A is loaded in the following order to optimize cache at the diagonal blocks.
+                    //[3  0  1  2]
+                    //[6  7  4  5]
+                    //[9  10 11 8]
+                    //[12 12 14 15]
+                    for (yyy = 0; yyy < ddy; ++yyy) {
+                        for (ii = 0; ii < ddx; ++ii) {
+                            xxx = (ii + yyy + 1) % ddx;
+                            B[x + xx + xxx][y + yy + yyy] = A[y + yy + yyy][x + xx + xxx];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void mytrans32(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
     int x, y, xx, yy, i;
     for (y = 0; y < M; y += dy) {
         for (x = 0; x < N; x += dx) {

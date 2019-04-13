@@ -113,7 +113,7 @@ void trans_one_level_blocking_4(int M, int N, int A[N][M], int B[M][N])
     mytrans32(M, N, A, B, 4, 4);
 }
 
-char trans_one_level_blocking_8_desc[] = "One level blocking ";
+char trans_one_level_blocking_8_desc[] = "One level blocking 8";
 void trans_one_level_blocking_8(int M, int N, int A[N][M], int B[M][N])
 {
     mytrans32(M, N, A, B, 8, 8);

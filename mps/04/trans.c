@@ -107,6 +107,24 @@ void mytrans32(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
     }
 }
 
+char trans_one_level_blocking_4_desc[] = "One level blocking";
+void trans_one_level_blocking_4(int M, int N, int A[N][M], int B[M][N])
+{
+    mytrans32(M, N, A, B, 4, 4);
+}
+
+char trans_one_level_blocking_8_desc[] = "One level blocking";
+void trans_one_level_blocking_8(int M, int N, int A[N][M], int B[M][N])
+{
+    mytrans32(M, N, A, B, 8, 8);
+}
+
+char trans_one_level_blocking_16_desc[] = "One level blocking";
+void trans_one_level_blocking_16(int M, int N, int A[N][M], int B[M][N])
+{
+    mytrans32(M, N, A, B, 16, 16);
+}
+
 
 char trans1_desc[] = "Blocking transpose 1";
 void trans1(int M, int N, int A[N][M], int B[M][N])
@@ -252,6 +270,10 @@ void registerFunctions()
 //    registerTransFunction(trans14, trans14_desc);
 //    registerTransFunction(trans15, trans15_desc);
     registerTransFunction(trans16, trans16_desc);
+
+    registerTransFunction(trans_one_level_blocking_4, trans_one_level_blocking_4_desc);
+    registerTransFunction(trans_one_level_blocking_8, trans_one_level_blocking_8_desc);
+    registerTransFunction(trans_one_level_blocking_16, trans_one_level_blocking_16_desc);
 }
 
 /* 

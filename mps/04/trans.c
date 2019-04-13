@@ -52,7 +52,11 @@ void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
     ddy = dy / 2;
 
     for (y = 0; y < N; y += dy) {
+        if((y + dy) > N)
+            y = N - dy;
         for (x = 0; x < M; x += dx) {
+            if((x + dx) > M)
+                x = M - dx;
             //Blocking level 1:
             //Let 0, 1, 2, 3 represents elements of the same block.
             //The given matrix can be divided into 8x8 (dy x dx) blocks, one of which is as follow:

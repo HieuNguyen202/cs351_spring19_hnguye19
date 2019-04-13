@@ -62,9 +62,12 @@ void trans1(int M, int N, int A[N][M], int B[M][N]) {
     dy = 8;
     ddx = dx / 2;
     ddy = dy / 2;
-
     for (y = 0; y < N; y += dy) {
+        if((y + dy) > N)
+            y = N - dy;
         for (x = 0; x < M; x += dx) {
+            if((x + dx) > M)
+                x = M - dx;
             //Blocking level 1:
             //Let 0, 1, 2, 3 represents elements of the same block.
             //The given matrix can be divided into 8x8 (dy x dx) blocks, one of which is as follow:
@@ -100,8 +103,8 @@ void trans1(int M, int N, int A[N][M], int B[M][N]) {
 }
 
 int main(int argc, char** argv) {
-    int M = 64;
-    int N = 64;
+    int M = 67;
+    int N = 61;
     int A[N][M];
     int B[M][N];
     int cidx = 0;
@@ -109,13 +112,13 @@ int main(int argc, char** argv) {
     int cache_size = 32;
         for (int j = 0; j < N; ++j) {
             for (int i = 0; i < M; ++i) {
-                A[j][i] = j;
-                B[i][j] = 0;
-//                A[j][i] = (cidx / block_size) % 32;
-//                cidx++;
+//                A[j][i] = i;
+//                B[i][j] = 0;
+                A[j][i] = (cidx / block_size) % 32;
+                cidx++;
             }
         }
-    trans1(M, N, A, B);
+    trans(M, N, A, B);
     printf("Is transposed: %d\n", is_transpose(M, N, A, B));
     print_matrix(M, N, A, B);
 }

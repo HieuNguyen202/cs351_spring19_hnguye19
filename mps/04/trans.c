@@ -107,131 +107,131 @@ void mytrans32(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
     }
 }
 
-char trans_one_level_blocking_4_desc[] = "One level blocking";
+char trans_one_level_blocking_4_desc[] = "One level blocking 4";
 void trans_one_level_blocking_4(int M, int N, int A[N][M], int B[M][N])
 {
     mytrans32(M, N, A, B, 4, 4);
 }
 
-char trans_one_level_blocking_8_desc[] = "One level blocking";
+char trans_one_level_blocking_8_desc[] = "One level blocking ";
 void trans_one_level_blocking_8(int M, int N, int A[N][M], int B[M][N])
 {
     mytrans32(M, N, A, B, 8, 8);
 }
 
-char trans_one_level_blocking_16_desc[] = "One level blocking";
+char trans_one_level_blocking_16_desc[] = "One level blocking 16";
 void trans_one_level_blocking_16(int M, int N, int A[N][M], int B[M][N])
 {
     mytrans32(M, N, A, B, 16, 16);
 }
 
 
-char trans1_desc[] = "Blocking transpose 1";
+char trans1_desc[] = "Two level blocking transpose 1";
 void trans1(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 1;
     int block_size_row = 1;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans2_desc[] = "Blocking transpose 2";
+char trans2_desc[] = "Two level blocking transpose 2";
 void trans2(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 2;
     int block_size_row = 2;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans3_desc[] = "Blocking transpose 3";
+char trans3_desc[] = "Two level blocking transpose 3";
 void trans3(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 3;
     int block_size_row = 3;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans4_desc[] = "Blocking transpose 4";
+char trans4_desc[] = "Two level blocking transpose 4";
 void trans4(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 4;
     int block_size_row = 4;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans5_desc[] = "Blocking transpose 5";
+char trans5_desc[] = "Two level blocking transpose 5";
 void trans5(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 5;
     int block_size_row = 5;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans6_desc[] = "Blocking transpose 6";
+char trans6_desc[] = "Two level blocking transpose 6";
 void trans6(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 6;
     int block_size_row = 6;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans7_desc[] = "Blocking transpose 7";
+char trans7_desc[] = "Two level blocking transpose 7";
 void trans7(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 7;
     int block_size_row = 7;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans8_desc[] = "Blocking transpose 8";
+char trans8_desc[] = "Two level blocking transpose 8";
 void trans8(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 8;
     int block_size_row = 8;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans9_desc[] = "Blocking transpose 9";
+char trans9_desc[] = "Two level blocking transpose 9";
 void trans9(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 9;
     int block_size_row = 9;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans10_desc[] = "Blocking transpose 10";
+char trans10_desc[] = "Two level blocking transpose 10";
 void trans10(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 10;
     int block_size_row = 10;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans11_desc[] = "Blocking transpose 11";
+char trans11_desc[] = "Two level blocking transpose 11";
 void trans11(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 11;
     int block_size_row = 11;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans12_desc[] = "Blocking transpose 12";
+char trans12_desc[] = "Two level blocking transpose 12";
 void trans12(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 12;
     int block_size_row = 12;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans13_desc[] = "Blocking transpose 13";
+char trans13_desc[] = "Two level blocking transpose 13";
 void trans13(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 13;
     int block_size_row = 13;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans14_desc[] = "Blocking transpose 14";
+char trans14_desc[] = "Two level blocking transpose 14";
 void trans14(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 14;
     int block_size_row = 14;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans15_desc[] = "Blocking transpose 15";
+char trans15_desc[] = "Two level blocking transpose 15";
 void trans15(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 15;
     int block_size_row = 15;
     mytrans(M, N, A, B, block_size_row, block_size_int);
 }
-char trans16_desc[] = "Blocking transpose 16";
+char trans16_desc[] = "Two level blocking transpose 16";
 void trans16(int M, int N, int A[N][M], int B[M][N])
 {
     int block_size_int = 16;

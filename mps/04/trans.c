@@ -81,7 +81,6 @@ void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
                             B[x + xx + xxx][y + yy + yyy] = A[y + yy + yyy][x + xx + xxx];
                         }
                     }
-                    print_matrix(M, N, A, B);
                 }
             }
         }

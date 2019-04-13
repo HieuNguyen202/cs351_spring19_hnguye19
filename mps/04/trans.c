@@ -47,7 +47,7 @@ void trans(int M, int N, int A[N][M], int B[M][N])
 }
 
 void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
-    int x, xx, xxx, y, yy, yyy, i, ii, ddx, ddy;
+    int x, xx, xxx, y, yy, yyy, i, ii, dx, ddx, dy, ddy;
     ddx = dx / 2;
     ddy = dy / 2;
 
@@ -68,7 +68,7 @@ void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
             //Each 4x4 sub-block is processed in the next two inner for loops.
             for (yy = 0; yy < dy; yy += ddy) {
                 for (i = 0; i < dx; i += ddx) {
-                    xx = yy == 1 ? ddx - i : i;
+                    xx = (yy / ddy) == 1 ? ddx - i : i;
                     //Blocking level 2
                     //Each 4x4 sub-block of matrix A is loaded in the following order to optimize cache at the diagonal blocks.
                     //[3  0  1  2]
@@ -81,6 +81,7 @@ void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
                             B[x + xx + xxx][y + yy + yyy] = A[y + yy + yyy][x + xx + xxx];
                         }
                     }
+                    print_matrix(M, N, A, B);
                 }
             }
         }

@@ -34,6 +34,7 @@ int is_transpose(int M, int N, int A[N][M], int B[M][N])
 
 int print_matrix(int M, int N, int A[N][M], int B[M][N])
 {
+    fpurge(stdout);
     int i, j;
     printf("Matrix A:\n");
     for (i = 0; i < N; i++) {
@@ -79,7 +80,7 @@ void trans1(int M, int N, int A[N][M], int B[M][N]) {
             //Each 4x4 sub-block is processed in the next two inner for loops.
             for (yy = 0; yy < dy; yy += ddy) {
                 for (i = 0; i < dx; i += ddx) {
-                    xx = yy == 1 ? ddx - i : i;
+                    xx = (yy / ddy) == 1 ? ddx - i : i;
                     //Blocking level 2
                     //Each 4x4 sub-block of matrix A is loaded in the following order to optimize cache at the diagonal blocks.
                     //[3  0  1  2]
@@ -92,6 +93,7 @@ void trans1(int M, int N, int A[N][M], int B[M][N]) {
                             B[x + xx + xxx][y + yy + yyy] = A[y + yy + yyy][x + xx + xxx];
                         }
                     }
+                    print_matrix(M, N, A, B);
                 }
             }
         }
@@ -109,6 +111,7 @@ int main(int argc, char** argv) {
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < M; ++j) {
             A[i][j] = i*2+j;
+            B[i][j] = 0;
 //            A[i][j] = (cidx/block_size)%32;
 //            cidx++;
         }

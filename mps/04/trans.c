@@ -51,8 +51,8 @@ void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
     ddx = dx / 2;
     ddy = dy / 2;
 
-    for (y = 0; y < M; y += dy) {
-        for (x = 0; x < N; x += dx) {
+    for (y = 0; y < N; y += dy) {
+        for (x = 0; x < M; x += dx) {
             //Blocking level 1:
             //Let 0, 1, 2, 3 represents elements of the same block.
             //The given matrix can be divided into 8x8 (dy x dx) blocks, one of which is as follow:
@@ -89,8 +89,8 @@ void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
 
 void mytrans32(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
     int x, y, xx, yy, i;
-    for (y = 0; y < M; y += dy) {
-        for (x = 0; x < N; x += dx) {
+    for (y = 0; y < N; y += dy) {
+        for (x = 0; x < M; x += dx) {
             //Blocking of size dyXdx
             //Assuming the block is size 4x4, the order that elements from matrix A should be loaded is as follow:
             //[3  0  1  2]

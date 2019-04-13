@@ -37,19 +37,19 @@ int print_matrix(int M, int N, int A[N][M], int B[M][N])
     fpurge(stdout);
     int i, j;
     printf("Matrix A:\n");
-    for (i = 0; i < N; i++) {
+    for (j = 0; j < N; ++j) {
         printf("[");
-        for (j = 0; j < M; ++j) {
-            printf("%2d\t", A[i][j]);
+        for (i = 0; i < M; i++) {
+            printf("%2d\t", A[j][i]);
         }
         printf("]\n");
     }
 
     printf("Matrix B:\n");
-    for (i = 0; i < N; i++) {
+    for (j = 0; j < M; j++) {
         printf("[");
-        for (j = 0; j < M; ++j) {
-            printf("%2d\t", B[i][j]);
+        for (i = 0; i < N; ++i) {
+            printf("%2d\t", B[j][i]);
         }
         printf("]\n");
     }
@@ -63,8 +63,8 @@ void trans1(int M, int N, int A[N][M], int B[M][N]) {
     ddx = dx / 2;
     ddy = dy / 2;
 
-    for (y = 0; y < M; y += dy) {
-        for (x = 0; x < N; x += dx) {
+    for (y = 0; y < N; y += dy) {
+        for (x = 0; x < M; x += dx) {
             //Blocking level 1:
             //Let 0, 1, 2, 3 represents elements of the same block.
             //The given matrix can be divided into 8x8 (dy x dx) blocks, one of which is as follow:
@@ -93,7 +93,6 @@ void trans1(int M, int N, int A[N][M], int B[M][N]) {
                             B[x + xx + xxx][y + yy + yyy] = A[y + yy + yyy][x + xx + xxx];
                         }
                     }
-                    print_matrix(M, N, A, B);
                 }
             }
         }
@@ -101,21 +100,21 @@ void trans1(int M, int N, int A[N][M], int B[M][N]) {
 }
 
 int main(int argc, char** argv) {
-    int M = 32;
-    int N = 32;
+    int M = 64;
+    int N = 64;
     int A[N][M];
-    int B[N][M];
+    int B[M][N];
     int cidx = 0;
     int block_size = 8;
     int cache_size = 32;
-    for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < M; ++j) {
-            A[i][j] = i*2+j;
-            B[i][j] = 0;
-//            A[i][j] = (cidx/block_size)%32;
-//            cidx++;
+        for (int j = 0; j < N; ++j) {
+            for (int i = 0; i < M; ++i) {
+                A[j][i] = j;
+                B[i][j] = 0;
+//                A[j][i] = (cidx / block_size) % 32;
+//                cidx++;
+            }
         }
-    }
     trans1(M, N, A, B);
     printf("Is transposed: %d\n", is_transpose(M, N, A, B));
     print_matrix(M, N, A, B);

@@ -22,6 +22,54 @@ int is_transpose(int M, int N, int A[N][M], int B[M][N]);
 char transpose_submit_desc[] = "Transpose submission";
 void transpose_submit(int M, int N, int A[N][M], int B[M][N])
 {
+    int x, xx, xxx, y, yy, yyy, i, ii, dx = 8, ddx, dy = 8, ddy;
+    if(N == 32){
+        dx = 16;
+        dy = 16;
+    } else if (N == 64){
+        dx = 8;
+        dy = 8;
+    }
+    ddx = dx / 2;
+    ddy = dy / 2;
+    for (y = 0; y < N; y += dy) {
+        if((y + dy) > N)
+            y = N - dy;
+        for (x = 0; x < M; x += dx) {
+            if((x + dx) > M)
+                x = M - dx;
+            //Blocking level 1:
+            //Let 0, 1, 2, 3 represents elements of the same block.
+            //The given matrix can be divided into 8x8 (dy x dx) blocks, one of which is as follow:
+            //[0 0 0 0 1 1 1 1]
+            //[0 0 0 0 1 1 1 1]
+            //[0 0 0 0 1 1 1 1]
+            //[0 0 0 0 1 1 1 1]
+            //[3 3 3 3 2 2 2 2]
+            //[3 3 3 3 2 2 2 2]
+            //[3 3 3 3 2 2 2 2]
+            //[3 3 3 3 2 2 2 2]
+            //In blocking level 1, matrix A, we will load 4x4 (ddy x ddx)sub-blocks in this order: 0, 1, 2, 3
+            //Each 4x4 sub-block is processed in the next two inner for loops.
+            for (yy = 0; yy < dy; yy += ddy) {
+                for (i = 0; i < dx; i += ddx) {
+                    xx = (yy / ddy) == 1 ? ddx - i : i;
+                    //Blocking level 2
+                    //Each 4x4 sub-block of matrix A is loaded in the following order to optimize cache at the diagonal blocks.
+                    //[3  0  1  2]
+                    //[6  7  4  5]
+                    //[9  10 11 8]
+                    //[12 12 14 15]
+                    for (yyy = 0; yyy < ddy; ++yyy) {
+                        for (ii = 0; ii < ddx; ++ii) {
+                            xxx = (ii + yyy + 1) % ddx;
+                            B[x + xx + xxx][y + yy + yyy] = A[y + yy + yyy][x + xx + xxx];
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 /* 
@@ -50,7 +98,6 @@ void mytrans(int M, int N, int A[N][M], int B[M][N], int dy, int dx) {
     int x, xx, xxx, y, yy, yyy, i, ii, ddx, ddy;
     ddx = dx / 2;
     ddy = dy / 2;
-
     for (y = 0; y < N; y += dy) {
         if((y + dy) > N)
             y = N - dy;

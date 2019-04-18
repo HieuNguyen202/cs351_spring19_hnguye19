@@ -12,7 +12,11 @@
  * This is the default path where the driver will look for the
  * default tracefiles. You can override it at runtime with the -t flag.
  */
-#define TRACEDIR "./traces/";
+//#define TRACEDIR "./traces/";
+
+//TODO: changed this when submmit
+#define TRACEDIR "/Users/hn/Projects/CLionProjects/CS351/cs351_spring19_hnguye19/mps/05/traces/";
+
 
 /*
  * This is the list of default tracefiles in TRACEDIR that the driver

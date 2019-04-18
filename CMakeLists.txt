@@ -14,3 +14,19 @@ add_executable(csim ${SOURCE_FILES_4})
 
 set(SOURCE_FILES_4_1 mps/04/mytrans.c)
 add_executable(mytrans ${SOURCE_FILES_4_1})
+
+set(SOURCE_FILES_5 mps/05/mdriver.c)
+
+set(mdriver.o mps/05/mdriver.c mps/05/fsecs.h mps/05/fcyc.h mps/05/clock.h mps/05/memlib.h mps/05/config.h mps/05/mm.h)
+set(memlib.o mps/05/memlib.c mps/05/memlib.h)
+set(mm.o mps/05/mm.c mps/05/mm.h mps/05/memlib.h)
+set(fsecs.o mps/05/fsecs.c mps/05/fsecs.h mps/05/config.h)
+set(fcyc.o mps/05/fcyc.c mps/05/fcyc.h)
+set(ftimer.o mps/05/ftimer.c mps/05/ftimer.h mps/05/config.h)
+set(clock.o mps/05/clock.c mps/05/clock.h)
+
+add_executable(mdriver ${mdriver.o} ${memlib.o} ${mm.o} ${fsecs.o} ${fcyc.o} ${ftimer.o} ${clock.o})
+
+#set (CMAKE_C_FLAGS -Wall -Werror -g)
+#set (CMAKE_C_FLAGS -g)
+#set (CMAKE_C_FLAGS -Werror)

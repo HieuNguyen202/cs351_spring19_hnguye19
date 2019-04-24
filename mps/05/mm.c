@@ -13,10 +13,30 @@
 /* single word (4) or double word (8) alignment */
 #define ALIGNMENT 8
 
+/* a work is 4 bytes */
+#define WSIZE 4
+
 /* rounds up to the nearest multiple of ALIGNMENT */
 #define ALIGN(size) (((size) + (ALIGNMENT-1)) & ~0x7)
 
+//Masks
+#define USED 0x00000001
+#define NO_FLAGS 0x00000000
+#define PREV_FREE 0x00000002
+#define EXTRA_FLAG 0x00000004
+#define SIZE_MASK 0xFFFFFFF8
+//#define NULL 0x00000000
 
+//Header interactions
+#define IS_USED(header) (((int)header&USED))
+#define IS_PREV_BLOCK_FREE(header) (((int)header & PREV_FREE))
+#define IS_EXTRA_FLAG_SET(header) (((int)header & EXTRA_FLAG))
+#define BLOCK_SIZE(header) (((int)header & SIZE_MASK))
+#define SET_FLAG(header, flags) ((int)header|(flags))
+#define CLEAR_FLAG(header, flags) ((int)header&(~(flags)))
+#define HEADER(size, flags) ((void*)(size|(flags)))
+
+//
 #define SIZE_T_SIZE (ALIGN(sizeof(size_t)))
 
 /* 
@@ -26,9 +46,44 @@ trace-driven driver program that you will use to evaluate your implementation) c
 any necessary initializations, such as allocating the initial heap area. The return value should be -1 if
 there was a problem in performing the initialization, 0 otherwise.
  */
+void** heap_start;
+void** prologue;
+void** epilogue;
 int mm_init(void)
 {
-  return 0;
+    mem_init();
+    if((heap_start = mem_sbrk(4*WSIZE)) == (void*)-1) //get 4 words first
+        return -1;
+    prologue = heap_start + 1;
+    epilogue = heap_start + 3;
+    heap_start[0] = HEADER(0,NO_FLAGS);; //unused
+    heap_start[1] = HEADER(8,USED); //prologue
+    heap_start[2] = HEADER(8,USED); //prologue
+    heap_start[3] = HEADER(0,USED); //epilogue
+    return 0;
+}
+
+//Return the size of the header
+int print_header(void* header, char flag){
+    printf("[%c%d|%c%c%c]", flag, BLOCK_SIZE(header), IS_EXTRA_FLAG_SET(header)?'1':'0', IS_PREV_BLOCK_FREE(header)?'1':'0', IS_USED(header)?'1':'0');
+    return BLOCK_SIZE(header);
+}
+
+void mm_print(void){
+    void ** addr;
+    //loop
+    if(addr == heap_start){
+        printf("[unused]");
+        //unused block
+    } else if (addr == prologue || addr == prologue + 1){ // header Pro
+        print_header(*addr, 'p');
+    } else if (BLOCK_SIZE(*addr) == 0){
+        print_header(*addr, 'e');         //header Ep
+    } else{
+        int size;
+        size = print_header(*addr, 'r'); //regular header
+        printf("[%d words]", size/4 -1); //payload
+    }
 }
 
 /* 
@@ -99,7 +154,7 @@ void *mm_realloc(void *ptr, size_t size)
 }
 
 int mm_check(void){
-
+    return 0;
 }
 
 //Naive Implementation

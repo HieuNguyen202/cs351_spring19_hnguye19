@@ -45,11 +45,11 @@ void *mm_malloc(size_t size)
 {
   int newsize = ALIGN(size + SIZE_T_SIZE);
   void *p = mem_sbrk(newsize);
-  if ((long)p == -1)
+  if ((long)p == -1)    //sbrk failed
     return NULL;
-  else {
-    *(size_t *)p = size;
-    return (void *)((char *)p + SIZE_T_SIZE);
+  else {                //sbrk secceeded
+    *(size_t *)p = size;        //header
+    return (void *)((char *)p + SIZE_T_SIZE);     //The first address after the header
   }
 }
 
@@ -101,3 +101,19 @@ void *mm_realloc(void *ptr, size_t size)
 int mm_check(void){
 
 }
+
+//Naive Implementation
+//Results for mm malloc:
+//trace  valid  util     ops      secs  Kops
+//0       yes   23%    5694  0.000060 94742
+//1       yes   19%    5848  0.000055106327
+//2       yes   30%    6648  0.000079 84259
+//3       yes   40%    5380  0.000054100000
+//4        no     -       -         -     -
+//5        no     -       -         -     -
+//6        no     -       -         -     -
+//7       yes   55%   12000  0.000136 87912
+//8       yes   51%   24000  0.000172139292
+//9        no     -       -         -     -
+//10        no     -       -         -     -
+//Total            -       -         -     -

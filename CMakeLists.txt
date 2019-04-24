@@ -27,6 +27,11 @@ set(clock.o mps/05/clock.c mps/05/clock.h)
 
 add_executable(mdriver ${mdriver.o} ${memlib.o} ${mm.o} ${fsecs.o} ${fcyc.o} ${ftimer.o} ${clock.o})
 
+
+set(SOURCE_FILES_5_1 mps/05/test.c)
+add_executable(test ${SOURCE_FILES_5_1})
+
+
 #set (CMAKE_C_FLAGS -Wall -Werror -g)
 #set (CMAKE_C_FLAGS -g)
 #set (CMAKE_C_FLAGS -Werror)

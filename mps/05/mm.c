@@ -36,28 +36,28 @@ int mm_init(void)
 }
 
 //Return the size of the header
-void print_header(void* header, char flag){
-    printf("[%c%d|%c%c%c]", flag, BLOCK_SIZE_BYTES(header)/WSIZE, IS_EXTRA_FLAG_SET(header)?'1':'0', IS_PREV_BLOCK_FREE(header)?'1':'0', IS_USED(header)?'1':'0');
+void print_header(header_t * header, char flag){
+    printf("[%p %c%d|%c%c%c]",header , flag, BLOCK_SIZE_BYTES(header)/WSIZE, IS_EXTRA_FLAG_SET(header)?'1':'0', IS_PREV_BLOCK_FREE(header)?'1':'0', IS_USED(header)?'1':'0');
 }
 
 void mm_print(void) {
     size_t size_words, size_bytes;
-    for (header_t *header_addr = heap_start; header_addr <= epilogue; ++header_addr) {
-        if (header_addr == heap_start) {
-            print_header(*header_addr, 'u'); //unused block
+    for (header_t *header = heap_start; header <= epilogue; ++header) {
+        if (header == heap_start) {
+            print_header(header, 'u'); //unused block
             printf("\n");
-        } else if (header_addr == prologue || header_addr == prologue + 1) {
-            print_header(*header_addr, 'p'); //prologue
+        } else if (header == prologue || header == prologue + 1) {
+            print_header(header, 'p'); //prologue
             printf("\n");
-        } else if (BLOCK_SIZE_BYTES(*header_addr) == 0) {
-            print_header(*header_addr, 'e'); //epilogue
+        } else if (BLOCK_SIZE_BYTES(header) == 0) {
+            print_header(header, 'e'); //epilogue
             printf("\n");
         } else {
-            print_header(*header_addr, 'r'); //regular header
-            size_bytes = BLOCK_SIZE_BYTES(*header_addr);
+            print_header(header, 'r'); //regular header
+            size_bytes = BLOCK_SIZE_BYTES(header);
             size_words = size_bytes/WSIZE;
             printf("[%d words]\n", size_words - 1);     //payload
-            header_addr += size_words - 1;
+            header += size_words - 1;
         }
     }
 }
@@ -77,34 +77,25 @@ void *mm_malloc(size_t size)
     size_t new_size_bytes = ALIGN(size + SIZE_T_SIZE);
     size_t new_size_words = new_size_bytes/WSIZE;
     size_t block_size;
-    header_t *header_addr = prologue;
-    while(header_addr < epilogue) {//While header_addr < e
-//        block_size = BLOCK_SIZE_BYTES(*header_addr);
-//        if(!IS_USED(*header_addr) &&  new_size_bytes <= block_size ) { //If the block is free and big enough
-//            *header_addr = MAKE_HEADER(new_size_bytes,USED);
+    header_t *header = prologue;
+    while(header < epilogue) {//While header < e
+//        block_size = BLOCK_SIZE_BYTES(*header);
+//        if(!IS_USED(*header) &&  new_size_bytes <= block_size ) { //If the block is free and big enough
+//            *header = MAKE_HEADER(new_size_bytes,USED);
 //            //clean up the next block
 //            //If true allocate this block
-//            return header_addr + 1; //return the address of the payload
+//            return header + 1; //return the address of the payload
 //        }
-        header_addr += BLOCK_SIZE_WORDS(*header_addr); //header_addr get the value of the next header
+        header += BLOCK_SIZE_WORDS(header); //header get the value of the next header
     }
     //Reach here mean no qualified free block found, need o sbrk more mem
     if(mem_sbrk(new_size_bytes) == -1)
         return NULL; //sbrk failed
-    *header_addr = MAKE_HEADER(new_size_bytes,USED); //allocate the new block
+    *header = MAKE_HEADER(new_size_bytes,USED); //allocate the new block
     epilogue += new_size_words; //update epilogue's address
     *epilogue = MAKE_HEADER(0,USED); //set epilogue value
-    return (void*) (header_addr + SIZE_T_SIZE); //return the address of the payload
-
-  int newsize = ALIGN(size + SIZE_T_SIZE);
-  void *p = mem_sbrk(new_size_bytes);
-  if ((long)p == -1)    //sbrk failed
-    return NULL;
-  else {                //sbrk succeeded
-    *(size_t *)p = size;        //header
-    return (void *)((char *)p + SIZE_T_SIZE);     //The first address after the header
+    return (void*) (header + SIZE_T_SIZE); //return the address of the payload
   }
-}
 
 /*
  * mm_free - Freeing a block does nothing.
@@ -112,8 +103,30 @@ void *mm_malloc(size_t size)
 guaranteed to work when the passed pointer (ptr) was returned by an earlier call to mm_malloc or
 mm_realloc and has not yet been freed.
  */
-void mm_free(void *ptr)
-{
+void mm_free(void *ptr){
+    header_t *header, *new_header, *next_header;
+
+    header = ((header_t*)ptr) - SIZE_T_SIZE;
+
+    size_t s = BLOCK_SIZE_BYTES(header);
+
+    CLEAR_FLAG(header, USED); //Make header unused
+
+    //If prev block is free, combine
+    new_header = header;
+    while(IS_PREV_BLOCK_FREE(new_header)){
+        new_header = PREV_HEADER(new_header);
+        s += BLOCK_SIZE_BYTES(new_header);
+    }
+    //If next blocks are free, also combine
+    next_header = NEXT_HEADER(header);
+    while(!IS_USED(next_header)){
+        s += BLOCK_SIZE_BYTES(next_header);
+        next_header = NEXT_HEADER(next_header);
+    }
+    *new_header = MAKE_HEADER(s, NO_FLAGS); //Create new free header
+    *FOOTER(new_header) = *new_header; //Make footer
+    SET_FLAG(NEXT_HEADER(new_header), PREV_FREE); //Set PREV_FREE flag for the next used block
 }
 
 /*

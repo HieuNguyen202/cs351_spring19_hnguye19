@@ -54,19 +54,35 @@ int main(int argc, char **argv){
     void *header = (void*)9;
     void *data1, *data2, *data3, *data4 ;
     mm_init();
+    mm_print();
     data1 = mm_malloc(1);
+    mm_print();
     data2 = mm_malloc(2);
-    data3 = mm_malloc(10);
-    data4 = mm_malloc(10);
     mm_print();
     mm_free(data1);
-    mm_free(data2);
-    mm_free(data3);
-    mm_free(data4);
-    data4 = mm_malloc(10);
-    data4 = mm_malloc(10);
-
-    printf("\n");
     mm_print();
+    data1 = mm_malloc(6);
+    mm_print();
+    data2 = mm_malloc(1);
+    mm_print();
+    mm_free(data1);
+    mm_print();
+    data1 = mm_malloc(1);
+    mm_print();
+
+    data1 = mm_malloc(1);
+    mm_print();
+
+
+
+//    data3 = mm_malloc(10);
+//    data4 = mm_malloc(10);
+//    mm_free(data1);
+//    mm_free(data2);
+//    mm_free(data3);
+//    mm_free(data4);
+//    data4 = mm_malloc(10);
+//    data4 = mm_malloc(10);
+
 }
 

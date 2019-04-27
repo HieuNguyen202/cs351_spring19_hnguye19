@@ -60,6 +60,7 @@ void mm_print(void) {
             header += size_words - 1;
         }
     }
+    printf("\n");
 }
 
 /* 
@@ -74,27 +75,52 @@ implementation should do likewise and always return 8-byte aligned pointers.
  */
 void *mm_malloc(size_t size)
 {
+//    printf("malloc %d\n", size);
+
     size_t new_size_bytes = ALIGN(size + SIZE_T_SIZE);
     size_t new_size_words = new_size_bytes/WSIZE;
-    size_t block_size;
+    size_t block_size_bytes;
+    int remaining;
     header_t *header = prologue;
-    while(header < epilogue) {//While header < e
-//        block_size = BLOCK_SIZE_BYTES(*header);
-//        if(!IS_USED(*header) &&  new_size_bytes <= block_size ) { //If the block is free and big enough
-//            *header = MAKE_HEADER(new_size_bytes,USED);
-//            //clean up the next block
-//            //If true allocate this block
-//            return header + 1; //return the address of the payload
-//        }
+    while(header < epilogue) { //Traverse all blocks
+        if(!IS_USED(header)) {
+            block_size_bytes = BLOCK_SIZE_BYTES(header);
+            remaining = block_size_bytes - new_size_bytes;
+            if(remaining >= 0){
+                if(remaining < MIN_BLOCK_SIZE_WORDS * WSIZE){ //Get the whole free block
+                    new_size_bytes = block_size_bytes;
+                    *header = MAKE_HEADER(new_size_bytes, USED);
+                    CLEAR_FLAG(NEXT_HEADER(header), PREV_FREE);
+                } else{ //split
+                    *header = MAKE_HEADER(new_size_bytes, USED);
+                    *NEXT_HEADER(header) = MAKE_HEADER(remaining, NO_FLAGS);    //Make header for the remaining free block
+                    *FOOTER(NEXT_HEADER(header)) = *NEXT_HEADER(header);        //Make footer for the remaining free block
+                }
+//                mm_print();
+                return (void*)(header + 1);
+            }
+        }
         header += BLOCK_SIZE_WORDS(header); //header get the value of the next header
     }
+//    printf("header %p, ep %p\n", header, epilogue);
     //Reach here mean no qualified free block found, need o sbrk more mem
-    if(mem_sbrk(new_size_bytes) == -1)
+    int sbrk_size_bytes = new_size_bytes;
+    //If the last regular block is free, the new block's header is that free block's header
+    if(IS_PREV_BLOCK_FREE(header)){
+        header = PREV_HEADER(header);
+        sbrk_size_bytes -= BLOCK_SIZE_BYTES(header);
+    } //else the new block's header has the address of the old epilogue block
+
+    if(mem_sbrk(sbrk_size_bytes) == -1){
+//        mm_print();
         return NULL; //sbrk failed
-    *header = MAKE_HEADER(new_size_bytes,USED); //allocate the new block
-    epilogue += new_size_words; //update epilogue's address
+    }
+
+    *header = MAKE_HEADER(new_size_bytes, USED); //allocate the new block
+    epilogue = NEXT_HEADER(header); //update epilogue's address
     *epilogue = MAKE_HEADER(0,USED); //set epilogue value
-    return (void*) (header + SIZE_T_SIZE); //return the address of the payload
+//    mm_print();
+    return (void*)(header + 1); //return the address of the payload
   }
 
 /*
@@ -104,9 +130,11 @@ guaranteed to work when the passed pointer (ptr) was returned by an earlier call
 mm_realloc and has not yet been freed.
  */
 void mm_free(void *ptr){
+//    printf("free %p\n", ptr);
+
     header_t *header, *new_header, *next_header;
 
-    header = ((header_t*)ptr) - SIZE_T_SIZE;
+    header = ((header_t*)ptr) - 1;
 
     size_t s = BLOCK_SIZE_BYTES(header);
 
@@ -114,10 +142,12 @@ void mm_free(void *ptr){
 
     //If prev block is free, combine
     new_header = header;
+//    mm_print();
     while(IS_PREV_BLOCK_FREE(new_header)){
         new_header = PREV_HEADER(new_header);
         s += BLOCK_SIZE_BYTES(new_header);
     }
+
     //If next blocks are free, also combine
     next_header = NEXT_HEADER(header);
     while(!IS_USED(next_header)){
@@ -127,6 +157,7 @@ void mm_free(void *ptr){
     *new_header = MAKE_HEADER(s, NO_FLAGS); //Create new free header
     *FOOTER(new_header) = *new_header; //Make footer
     SET_FLAG(NEXT_HEADER(new_header), PREV_FREE); //Set PREV_FREE flag for the next used block
+//    mm_print();
 }
 
 /*

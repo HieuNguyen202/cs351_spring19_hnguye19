@@ -166,7 +166,8 @@ int main(int argc, char **argv)
             num_tracefiles = 1;
             if ((tracefiles = realloc(tracefiles, 2*sizeof(char *))) == NULL)
 		unix_error("ERROR: realloc failed in main");
-	    strcpy(tracedir, "./"); 
+        	//TODO: uncomment the next line before submmiting
+//	    strcpy(tracedir, "./");
             tracefiles[0] = strdup(optarg);
             tracefiles[1] = NULL;
             break;

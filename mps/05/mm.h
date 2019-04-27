@@ -5,6 +5,7 @@ typedef uint32_t header_t;
 
 /* a word is 4 bytes */
 #define WSIZE 4
+#define MIN_BLOCK_SIZE_WORDS 2
 
 /* rounds up to the nearest multiple of ALIGNMENT */
 #define ALIGN(size) (((size) + (ALIGNMENT-1)) & ~0x7)

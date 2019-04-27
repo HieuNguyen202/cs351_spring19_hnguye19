@@ -56,7 +56,7 @@ void mm_print(void) {
             print_header(header, 'r'); //regular header
             size_bytes = BLOCK_SIZE_BYTES(header);
             size_words = size_bytes/WSIZE;
-            printf("[%d words]\n", size_words - 1);     //payload
+            printf("[%d words]\n", (int)(size_words - 1));     //payload
             header += size_words - 1;
         }
     }
@@ -78,7 +78,6 @@ void *mm_malloc(size_t size)
 //    printf("malloc %d\n", size);
 
     size_t new_size_bytes = ALIGN(size + SIZE_T_SIZE);
-    size_t new_size_words = new_size_bytes/WSIZE;
     size_t block_size_bytes;
     int remaining;
     header_t *header = prologue;
@@ -111,7 +110,7 @@ void *mm_malloc(size_t size)
         sbrk_size_bytes -= BLOCK_SIZE_BYTES(header);
     } //else the new block's header has the address of the old epilogue block
 
-    if(mem_sbrk(sbrk_size_bytes) == -1){
+    if(mem_sbrk(sbrk_size_bytes) == (void*)-1){
 //        mm_print();
         return NULL; //sbrk failed
     }

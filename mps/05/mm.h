@@ -1,5 +1,5 @@
 #include <stdio.h>
-typedef uint32_t header_t;
+typedef unsigned int header_t;
 /* single word (4) or double word (8) alignment */
 #define ALIGNMENT 8
 

@@ -10,35 +10,6 @@
 #include "mm.h"
 #include "memlib.h"
 
-/* single word (4) or double word (8) alignment */
-#define ALIGNMENT 8
-
-/* a work is 4 bytes */
-#define WSIZE 4
-
-/* rounds up to the nearest multiple of ALIGNMENT */
-#define ALIGN(size) (((size) + (ALIGNMENT-1)) & ~0x7)
-
-//Masks
-#define USED 0x00000001
-#define NO_FLAGS 0x00000000
-#define PREV_FREE 0x00000002
-#define EXTRA_FLAG 0x00000004
-#define SIZE_MASK 0xFFFFFFF8
-//#define NULL 0x00000000
-
-//Header interactions
-#define IS_USED(header) (((int)header&USED))
-#define IS_PREV_BLOCK_FREE(header) (((int)header & PREV_FREE))
-#define IS_EXTRA_FLAG_SET(header) (((int)header & EXTRA_FLAG))
-#define BLOCK_SIZE(header) (((int)header & SIZE_MASK))
-#define SET_FLAG(header, flags) ((int)header|(flags))
-#define CLEAR_FLAG(header, flags) ((int)header&(~(flags)))
-#define HEADER(size, flags) ((void*)(size|(flags)))
-
-//
-#define SIZE_T_SIZE (ALIGN(sizeof(size_t)))
-
 /* 
  * mm_init - initialize the malloc package.
  * : Before calling mm_malloc, mm_realloc or mm_free, the application program (i.e., the
@@ -70,19 +41,20 @@ int print_header(void* header, char flag){
 }
 
 void mm_print(void){
-    void ** addr;
-    //loop
-    if(addr == heap_start){
-        printf("[unused]");
-        //unused block
-    } else if (addr == prologue || addr == prologue + 1){ // header Pro
-        print_header(*addr, 'p');
-    } else if (BLOCK_SIZE(*addr) == 0){
-        print_header(*addr, 'e');         //header Ep
-    } else{
-        int size;
-        size = print_header(*addr, 'r'); //regular header
-        printf("[%d words]", size/4 -1); //payload
+    void **heap_end = mem_sbrk(0);
+    for (void **addr = heap_start; addr <= heap_end + 1; ++addr) {
+        if (addr == heap_start) {
+            printf("[unused]");
+            //unused block
+        } else if (addr == prologue || addr == prologue + 1) { // header Pro
+            print_header(*addr, 'p');
+        } else if (BLOCK_SIZE(*addr) == 0) {
+            print_header(*addr, 'e');         //header Ep
+        } else {
+            int size;
+            size = print_header(*addr, 'r'); //regular header
+            printf("[%d words]", size / 4 - 1); //payload
+        }
     }
 }
 

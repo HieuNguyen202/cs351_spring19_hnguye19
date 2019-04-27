@@ -29,7 +29,7 @@ add_executable(mdriver ${mdriver.o} ${memlib.o} ${mm.o} ${fsecs.o} ${fcyc.o} ${f
 
 
 set(SOURCE_FILES_5_1 mps/05/test.c)
-add_executable(test ${SOURCE_FILES_5_1})
+add_executable(test ${SOURCE_FILES_5_1} ${memlib.o} ${mm.o})
 
 
 #set (CMAKE_C_FLAGS -Wall -Werror -g)

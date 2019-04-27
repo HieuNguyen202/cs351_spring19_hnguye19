@@ -17,43 +17,47 @@ trace-driven driver program that you will use to evaluate your implementation) c
 any necessary initializations, such as allocating the initial heap area. The return value should be -1 if
 there was a problem in performing the initialization, 0 otherwise.
  */
-void** heap_start;
-void** prologue;
-void** epilogue;
+header_t* heap_start;
+header_t* prologue;
+header_t* epilogue;
 int mm_init(void)
 {
+    size_t init_words = 4;
     mem_init();
-    if((heap_start = mem_sbrk(4*WSIZE)) == (void*)-1) //get 4 words first
+    if((heap_start = mem_sbrk(init_words*(WSIZE*8))) == (void*)-1) //get 4 words first
         return -1;
     prologue = heap_start + 1;
+    heap_start[0] = MAKE_HEADER(0,NO_FLAGS);; //unused
+    heap_start[1] = MAKE_HEADER(2*WSIZE,USED); //prologue
+    heap_start[2] = MAKE_HEADER(2*WSIZE,USED); //prologue
+    heap_start[3] = MAKE_HEADER(0,USED); //epilogue
     epilogue = heap_start + 3;
-    heap_start[0] = HEADER(0,NO_FLAGS);; //unused
-    heap_start[1] = HEADER(8,USED); //prologue
-    heap_start[2] = HEADER(8,USED); //prologue
-    heap_start[3] = HEADER(0,USED); //epilogue
     return 0;
 }
 
 //Return the size of the header
-int print_header(void* header, char flag){
-    printf("[%c%d|%c%c%c]", flag, BLOCK_SIZE(header), IS_EXTRA_FLAG_SET(header)?'1':'0', IS_PREV_BLOCK_FREE(header)?'1':'0', IS_USED(header)?'1':'0');
-    return BLOCK_SIZE(header);
+void print_header(void* header, char flag){
+    printf("[%c%d|%c%c%c]", flag, BLOCK_SIZE_BYTES(header)/WSIZE, IS_EXTRA_FLAG_SET(header)?'1':'0', IS_PREV_BLOCK_FREE(header)?'1':'0', IS_USED(header)?'1':'0');
 }
 
-void mm_print(void){
-    void **heap_end = mem_sbrk(0);
-    for (void **addr = heap_start; addr <= heap_end + 1; ++addr) {
-        if (addr == heap_start) {
-            printf("[unused]");
-            //unused block
-        } else if (addr == prologue || addr == prologue + 1) { // header Pro
-            print_header(*addr, 'p');
-        } else if (BLOCK_SIZE(*addr) == 0) {
-            print_header(*addr, 'e');         //header Ep
+void mm_print(void) {
+    size_t size_words, size_bytes;
+    for (header_t *header_addr = heap_start; header_addr <= epilogue; ++header_addr) {
+        if (header_addr == heap_start) {
+            print_header(*header_addr, 'u'); //unused block
+            printf("\n");
+        } else if (header_addr == prologue || header_addr == prologue + 1) {
+            print_header(*header_addr, 'p'); //prologue
+            printf("\n");
+        } else if (BLOCK_SIZE_BYTES(*header_addr) == 0) {
+            print_header(*header_addr, 'e'); //epilogue
+            printf("\n");
         } else {
-            int size;
-            size = print_header(*addr, 'r'); //regular header
-            printf("[%d words]", size / 4 - 1); //payload
+            print_header(*header_addr, 'r'); //regular header
+            size_bytes = BLOCK_SIZE_BYTES(*header_addr);
+            size_words = size_bytes/WSIZE;
+            printf("[%d words]\n", size_words - 1);     //payload
+            header_addr += size_words - 1;
         }
     }
 }
@@ -70,11 +74,33 @@ implementation should do likewise and always return 8-byte aligned pointers.
  */
 void *mm_malloc(size_t size)
 {
+    size_t new_size_bytes = ALIGN(size + SIZE_T_SIZE);
+    size_t new_size_words = new_size_bytes/WSIZE;
+    size_t block_size;
+    header_t *header_addr = prologue;
+    while(header_addr < epilogue) {//While header_addr < e
+//        block_size = BLOCK_SIZE_BYTES(*header_addr);
+//        if(!IS_USED(*header_addr) &&  new_size_bytes <= block_size ) { //If the block is free and big enough
+//            *header_addr = MAKE_HEADER(new_size_bytes,USED);
+//            //clean up the next block
+//            //If true allocate this block
+//            return header_addr + 1; //return the address of the payload
+//        }
+        header_addr += BLOCK_SIZE_WORDS(*header_addr); //header_addr get the value of the next header
+    }
+    //Reach here mean no qualified free block found, need o sbrk more mem
+    if(mem_sbrk(new_size_bytes) == -1)
+        return NULL; //sbrk failed
+    *header_addr = MAKE_HEADER(new_size_bytes,USED); //allocate the new block
+    epilogue += new_size_words; //update epilogue's address
+    *epilogue = MAKE_HEADER(0,USED); //set epilogue value
+    return (void*) (header_addr + SIZE_T_SIZE); //return the address of the payload
+
   int newsize = ALIGN(size + SIZE_T_SIZE);
-  void *p = mem_sbrk(newsize);
+  void *p = mem_sbrk(new_size_bytes);
   if ((long)p == -1)    //sbrk failed
     return NULL;
-  else {                //sbrk secceeded
+  else {                //sbrk succeeded
     *(size_t *)p = size;        //header
     return (void *)((char *)p + SIZE_T_SIZE);     //The first address after the header
   }

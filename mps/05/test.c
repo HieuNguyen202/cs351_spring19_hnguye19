@@ -11,7 +11,7 @@ Test c syctax
 
 void test_HEADER(){
     for (uint i = 0; i < 1000; ++i) {
-        printf("HEADER(%08X) = %d\n", i, HEADER(i, USED));
+        printf("HEADER(%08X) = %d\n", i, MAKE_HEADER(i, USED));
     }
 }
 
@@ -41,7 +41,7 @@ void test_CLEAR_FLAG(){
 
 void test_BLOCK_SIZE(){
     for (uint i = 0; i < 1000; ++i) {
-        printf("BLOCK_SIZE(%08X) = %d\n", i, BLOCK_SIZE(i));
+        printf("BLOCK_SIZE_BYTES(%08X) = %d\n", i, BLOCK_SIZE_BYTES(i));
     }
 }
 
@@ -54,6 +54,11 @@ int main(int argc, char **argv){
 //    test_CLEAR_FLAG();
     void* header = (void*)9;
     mm_init();
+    for (int i = 1; i < 17; ++i) {
+        mm_malloc(i);
+    }
+
     mm_print();
+
 }
 

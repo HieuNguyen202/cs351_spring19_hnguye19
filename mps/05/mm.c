@@ -82,7 +82,7 @@ void *mm_malloc(size_t size)
     int remaining;
     header_t *header = prologue;
     while(header < epilogue) { //Traverse all blocks
-        if(!IS_USED(header)) {
+        if(!IS_USED(header)) { //If block is not used
             block_size_bytes = BLOCK_SIZE_BYTES(header);
             remaining = block_size_bytes - new_size_bytes;
             if(remaining >= 0){
@@ -90,11 +90,16 @@ void *mm_malloc(size_t size)
                     new_size_bytes = block_size_bytes;
                     *header = MAKE_HEADER(new_size_bytes, USED);
                     CLEAR_FLAG(NEXT_HEADER(header), PREV_FREE);
-                } else{ //split
-                    *header = MAKE_HEADER(new_size_bytes, USED);
+                    //*next block's prev free pointer = *current block's prev_free
+                    //*prev block's next free = *current block's next_free
+                } else{ //split and get the first block
+                    *header = MAKE_HEADER(new_size_bytes, USED);    //header header for the first used block
                     *NEXT_HEADER(header) = MAKE_HEADER(remaining, NO_FLAGS);    //Make header for the remaining free block
                     *FOOTER(NEXT_HEADER(header)) = *NEXT_HEADER(header);        //Make footer for the remaining free block
+                    //For the second block, update free pointers
+                    //Copy prev free and next free from the original big block
                 }
+                //Update the next free block pointer of the previous free block
 //                mm_print();
                 return (void*)(header + 1);
             }
@@ -105,7 +110,8 @@ void *mm_malloc(size_t size)
     //Reach here mean no qualified free block found, need o sbrk more mem
     int sbrk_size_bytes = new_size_bytes;
     //If the last regular block is free, the new block's header is that free block's header
-    if(IS_PREV_BLOCK_FREE(header)){
+    if(IS_PREV_BLOCK_FREE(header)){ //If the last block is free but not big enough
+        //Use it plus some more mem requested from the OS
         header = PREV_HEADER(header);
         sbrk_size_bytes -= BLOCK_SIZE_BYTES(header);
     } //else the new block's header has the address of the old epilogue block
@@ -114,10 +120,20 @@ void *mm_malloc(size_t size)
 //        mm_print();
         return NULL; //sbrk failed
     }
-
     *header = MAKE_HEADER(new_size_bytes, USED); //allocate the new block
+
     epilogue = NEXT_HEADER(header); //update epilogue's address
     *epilogue = MAKE_HEADER(0,USED); //set epilogue value
+
+    //if prev block was free
+        //header become the header of that block
+        //prev block's next free = new epilogue
+        //epilogue's prev free = curr's prev
+        //epilogue's next free = epilogue
+    //if prev block was not free
+        //epilogue is the current block
+        //copy over free pointers to the new epilogue
+        //prev's next free = epilogue
 //    mm_print();
     return (void*)(header + 1); //return the address of the payload
   }
@@ -132,13 +148,9 @@ void mm_free(void *ptr){
 //    printf("free %p\n", ptr);
 
     header_t *header, *new_header, *next_header;
-
     header = ((header_t*)ptr) - 1;
-
     size_t s = BLOCK_SIZE_BYTES(header);
-
     CLEAR_FLAG(header, USED); //Make header unused
-
     //If prev block is free, combine
     new_header = header;
 //    mm_print();
@@ -156,6 +168,11 @@ void mm_free(void *ptr){
     *new_header = MAKE_HEADER(s, NO_FLAGS); //Create new free header
     *FOOTER(new_header) = *new_header; //Make footer
     SET_FLAG(NEXT_HEADER(new_header), PREV_FREE); //Set PREV_FREE flag for the next used block
+    //last free header = prev(next_header)
+    //next free block's prev free = new_header
+    //prev free block's next free = new_header
+    //curr head's next free = next_header's next free
+    //curr head's prev free = stays the same
 //    mm_print();
 }
 
